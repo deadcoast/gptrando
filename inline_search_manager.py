@@ -9,7 +9,7 @@ class InlineSearchManager:
     def __init__(self):
         self.bar_find_next = self.bar_find_next
         self.find_previous = self.find_previous
-        self.perform_search = self.perform_search
+        self.perform_complex_search = self.perform_complex_search
         self.add_search_highlight = self.add_search_highlight
         self.clear_search_highlights = self.clear_search_highlights
         self.hide_search_bar = self.hide_search_bar
@@ -83,13 +83,13 @@ class InlineSearchManager:
     def setup_search_bar(self):
         self.search_bar = tk.Entry(self, font=font.Font(family='Courier New', size=12), width=30)
         self.search_bar.pack(side=tk.TOP, fill=tk.X)
-        self.search_bar.bind("<Return>", self.perform_search)
+        self.search_bar.bind("<Return>", self.perform_complex_search)
 
     def setup_bindings(self):
         self.text_widget.bind("<Control-f>", self.prompt_search_query)
         self.text_widget.bind("<Control-n>", self.bar_find_next)
         self.text_widget.bind("<Control-p>", self.find_previous)
-        self.text_widget.bind("<Control-Return>", self.perform_search)
+        self.text_widget.bind("<Control-Return>", self.perform_complex_search)
 
         self.text_widget.bind("<Control-s>", self.save_file)
         self.text_widget.bind("<Control-o>", self.open_file)
@@ -177,20 +177,7 @@ class InlineSearchManager:
         self.search_bar.pack(side=tk.TOP, fill=tk.X)
         self.search_bar.focus_set()
 
-    def prompt_search_query(self, event):
-        """
-        Prompts the user to enter a search query.
-        """
-        self.show_search_bar()
-        self.search_bar.delete(0, tk.END)
-
-    def find_next(self):
-        pass
-
-    def find_previous(self):
-        pass
-
-    def perform_search(self, event):
+    def perform_complex_search(self, event):
         """
         Perform a search based on the given event.
         """
@@ -213,38 +200,20 @@ class InlineSearchManager:
                 elif self.search_direction == "previous":
                     self.find_previous()
         except tk.TclError:
-            # Suggestion 7: Handle exceptions during the search process
-        except Exception:
-
-            # Suggestion 8: Handle exceptions during the search process
             messagebox.showerror("Error", "An error occurred during search.")
-
-            # Suggestion 9: Log the error details
+        except Exception:
+            messagebox.showerror("Error", "An error occurred during search.")
             logging.error("Error occurred during search", exc_info=True)
-
-            # Suggestion 10: Display an error message to the user
             messagebox.showerror("Error", "An error occurred during search. Please try again.")
-
-            # Suggestion 11: Clear any previous search highlights
             self.clear_search_highlights()
-
-            # Suggestion 12: Reset the search index to 1.0
             self.search_index = "1.0"
-
-            # Suggestion 13: Reset the search query to an empty string
             self.search_query = ""
-
-            # Suggestion 14: Reset the search direction to "next"
             self.search_direction = "next"
-
-            # Suggestion 15: Call find_next or find_previous based on user's choice
             if self.search_query:
                 if self.search_direction == "next":
                     self.find_next()
                 elif self.search_direction == "previous":
                     self.find_previous()
-
-        # Suggestion 16: Call find_next or find_previous based on user's choice
         if self.search_query:
             if self.search_direction == "next":
                 self.find_next()
@@ -252,7 +221,7 @@ class InlineSearchManager:
                 self.find_previous()
 
     def setup_bindings(self):
-        self.search_bar.bind("<Return>", self.perform_search)
+        self.search_bar.bind("<Return>", self.perform_complex_search)
         self.text_widget.bind("<Control-f>", self.prompt_search_query)
         self.text_widget.bind("<Control-g>", self.find_next)
         self.text_widget.bind("<Control-Shift-g>", self.find_previous)
@@ -276,7 +245,7 @@ class InlineSearchManager:
         self.text_widget.tag_config("highlight", background="yellow")
         self.search_highlights.append((start_index, end_index))
 
-    def perform_search(self, event=None):
+    def perform_complex_search(self, event=None):
         """
         Performs the inline search based on the user's query.
         """
@@ -331,7 +300,8 @@ class InlineSearchManager:
         """
         self.search_bar = tk.Entry(self, font=font.Font(family='Courier New', size=12), width=30)
         self.search_bar.pack(side=tk.TOP, fill=tk.X)
-        self.search_bar.bind("<Return>", self.perform_search)
+        self.search_bar.bind("<Return>", self.perform_complex_search)
+
     def close(self):
         self.master.destroy()
 
@@ -369,7 +339,7 @@ def setup_search_bar(self):
     """
     self.search_bar = tk.Entry(self, font=font.Font(family='Courier New', size=12), width=30)
     self.search_bar.pack(side=tk.TOP, fill=tk.X)
-    self.search_bar.bind("<Return>", self.perform_search)
+    self.search_bar.bind("<Return>", self.perform_complex_search)
 
 
 def clear_search_highlights(self):

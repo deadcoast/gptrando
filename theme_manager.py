@@ -125,7 +125,7 @@ class ThemeManager:
         self.hide_search_bar = self.inline_search_manager.hide_search_bar
         self.find_previous = self.inline_search_manager.find_previous
         self.find_next = self.inline_search_manager.find_next
-        self.perform_search = self.inline_search_manager.perform_search
+        self.perform_search = self.inline_search_manager.perform_complex_search
         self.prompt_search_query = self.inline_search_manager.prompt_search_query
         self.search_index = 1.0
         self.search_highlights = []
@@ -405,7 +405,7 @@ def setup_inline_search_manager(self):
     self.hide_search_bar = self.inline_search_manager.hide_search_bar
     self.find_previous = self.inline_search_manager.find_previous
     self.find_next = self.inline_search_manager.find_next
-    self.perform_search = self.inline_search_manager.perform_search
+    self.perform_complex_search = self.inline_search_manager.perform_complex_search
 
     self.prompt_search_query = self.inline_search_manager.prompt_search_query
 
@@ -449,40 +449,40 @@ def setup_search_bar(self):
     Initializes the search bar.
     """
     self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
-    self.search_bar.bind("<Return>", self.perform_search)
+    self.search_bar.bind("<Return>", self.perform_complex_search)
     self.search_bar.focus_set(
-        self.perform_search
+        self.perform_complex_search
     )
 
     self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
-    self.search_bar.bind("<Return>", self.perform_search)
+    self.search_bar.bind("<Return>", self.perform_complex_search)
     self.search_bar.focus_set(
-        self.perform_search
+        self.perform_complex_search
     )
 
     self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
-    self.search_bar.bind("<Return>", self.perform_search)
+    self.search_bar.bind("<Return>", self.perform_complex_search)
     self.search_bar.focus_set(
-        self.perform_search
+        self.perform_complex_search
     ),
 
     self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5),
-    self.search_bar.bind("<Return>", self.perform_search),
+    self.search_bar.bind("<Return>", self.perform_complex_search),
     self.search_bar.focus_set(
-        self.perform_search
+        self.perform_complex_search
     ),
 
     self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5),
-    self.search_bar.bind("<Return>", self.perform_search),
+    self.search_bar.bind("<Return>", self.perform_complex_search),
     self.search_bar.focus_set(
-        self.perform_search
+        self.perform_complex_search
     ),
 
     self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5),
-    self.search_bar.bind("<Return>", self.perform_search),
+    self.search_bar.bind("<Return>", self.perform_complex_search),
 
     self.search_bar.focus_set(
-        self.perform_search
+        self.perform_complex_search
     ),
 
 
