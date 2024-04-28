@@ -1,18 +1,12 @@
 import logging
-from collections import namedtuple
-import tkinter
-from tkinter import font
-
-import os
 import re
+import tkinter
 import tkinter as tk
-from tkinter import filedialog
+from collections import namedtuple
 from tkinter import font
-from tkinter import messagebox
 
-import content
-import self
-from sqlalchemy import null
+from gptrando.flare_widget import FlareTextExtension
+from gptrando.inline_search_manager import InlineSearchManager
 
 Palette = namedtuple('Palette', ['secondary', 'primary', 'tertiary'])
 
@@ -20,7 +14,8 @@ Palette = namedtuple('Palette', ['secondary', 'primary', 'tertiary'])
 class PaletteManager:
     def __init__(self, text_widget):
         assert text_widget is not None and isinstance(text_widget,
-                                                       tk.Text), "text_widget must be an instance of ExpectedClass and cannot be None"
+                                                      tk.Text), ("text_widget must be an instance of ExpectedClass "
+                                                                 "and cannot be None")
         self._palette = Palette('#303030', '#505050', '#202020')
         self.text_widget = text_widget
 
@@ -36,7 +31,8 @@ class PaletteManager:
             if not isinstance(color, str):
                 raise TypeError("color must be a string")
             if not self.color_regex.match(color):
-                raise ValueError(f"Invalid color value: {color}. Please provide a valid hex color code starting with '#' followed by 3 or 6 hexadecimal digits.")
+                raise ValueError(f"Invalid color value: {color}. Please provide a valid hex color code starting with "
+                                 f"'#' followed by 3 or 6 hexadecimal digits.")
 
     def apply_palette(self):
         """
@@ -79,6 +75,15 @@ class ThemeManager:
     """
 
     def __init__(self):
+        self.search_index = 1.0
+        self.search_highlights = tag_removes = []
+        self.search_close_button = tk.Button()
+        self.search_prev_button = tk.Button()
+        self.search_entry = tk.Entry()
+        self.text_widget = tk.Text()
+        self.search_bar = tk.Frame()
+        self.text_widget = tk.Text()
+        self.search_next_button = tk.Button()
         self.text_widget = tk.Text()
         self.init()
         self.setup_menu_bar()
@@ -100,19 +105,6 @@ class ThemeManager:
         self.destroy()
 
         self.quit()
-
-    def setup_text_formatting(self):
-        """
-        Configures the various text formatting options for the Flare widget.
-        """
-        bold_font = font.Font(family='Courier New', size=12, weight='bold')
-        italic_font = font.Font(family='Courier New', size=12, slant='italic')
-
-        self.text_widget.tag_configure('bold', font=bold_font)
-        self.text_widget.tag_configure('italic', font=italic_font)
-
-        self.text_widget.bind('<Control-b>', self.toggle_bold)
-        self.text_widget.bind('<Control-i>', self.toggle_italic)
 
     def setup_search_bar(self):
         """
@@ -256,13 +248,48 @@ class ThemeManager:
     def quit(self):
         pass
 
-    def clear_search_highlights(self):
+    SEARCH_HIGHLIGHT_TAG = "search_highlight"
+
+    def clear_search_highlights(self, START_INDEX=None, END_INDEX=None):
         """
         Removes all search result highlights from the text widget.
+        :param START_INDEX:
+        :param END_INDEX:
         """
-        for start_index, end_index in self.search_highlights:
-            self.text_widget.tag_remove("search_highlight", start_index, end_index)
-        self.search_highlights.clear()
+        try:
+            # Clear the list of search highlights
+            self.search_highlights.clear()
+
+            # Remove the search highlight tag from the text widget
+            self.text_widget.tag_remove(self.SEARCH_HIGHLIGHT_TAG, START_INDEX, END_INDEX)
+        except ValueError as e:
+            # Log the error details
+            logging.error("Error removing search highlight", exc_info=True)
+            return False
+        except tk.TclError as e:
+            # Log the error details
+            logging.error("Error removing search highlight", exc_info=True)
+            return False
+        return True
+
+    def add_search_highlight(self, search_index, param):
+        """
+        Adds a highlight to the search results.
+        """
+        if search_index is None or param is None:
+            return False
+        try:
+            self.text_widget.tag_add("search_highlight", search_index, param)
+        except Exception as e:
+            logging.error("Error adding search highlight", exc_info=True)
+        else:
+            try:
+                self.search_highlights.append((search_index, param))
+            except ValueError as e:
+                logging.error("Error Searching with Highlight", exc_info=True)
+                return False
+            else:
+                return True
 
     def hide_search_bar(self):
         """
@@ -295,6 +322,3 @@ class ThemeManager:
             self.theme_manager = ThemeManager()
             self.text_area = tkinter.Text()
             self.text_area.pack(fill=tk.BOTH, expand=True)
-
-    def add_search_highlight(self, search_index, param):
-        pass
