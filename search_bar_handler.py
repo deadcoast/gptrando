@@ -46,7 +46,7 @@ class SearchBar(tk.Entry):  # Custom search bar widget
         search_highlights: A list of tuples containing the start and end indices of search highlights.
     """
 
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, edit_menu=None, menubar=None, **kwargs):
         super().__init__(master, **kwargs)
 
         self.search_bar = tk.Entry(self, font=font.Font(family='Courier New', size=12), width=30)
@@ -74,7 +74,7 @@ class SearchBar(tk.Entry):  # Custom search bar widget
 
         self.text_area.pack(fill=tk.BOTH, expand=True)
 
-        self.parent = self.parent or self.master  # Use master as parent if not specified
+        self.parent = self.parent or self.master  # Use main as parent if not specified
         self.parent.title("HEAT UP Editor")
         self.palette_manager = PaletteManager()
         self.theme_manager = ThemeManager(self.palette_manager)
@@ -87,19 +87,6 @@ class SearchBar(tk.Entry):  # Custom search bar widget
 
         self._display_message("Ready")
 
-    def setup_menu_bar(self):
-        menubar = tk.Menu(self.parent)
-        self.parent.config(menu=menubar)
-
-        file_menu = tk.Menu(menubar)
-        menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="Open", command=self.open_file)
-        file_menu.add_command(label="Save", command=self.save_file)
-        file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.parent.quit)
-
-        edit_menu = tk.Menu(menubar)
-        menubar.add_cascade(label="Edit", menu=edit_menu)
         edit_menu.add_command(label="Undo", command=self.text_area.undo)
         edit_menu.add_command(label="Redo", command=self.text_area.redo)
         edit_menu.add_separator()

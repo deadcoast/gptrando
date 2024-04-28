@@ -1,25 +1,111 @@
 import tkinter as tk
+from doctest import master
+from hashlib import new
+from imaplib import Literal
+from os import name
 from tkinter import filedialog
 from tkinter import font
 from tkinter import messagebox
 from typing import Any
 
+import content
+from PIL.ImageColor import colormap
+from colorama import Cursor
+from fontTools.cffLib import width
+from numpy.lib.user_array import container
 from self import self
 from sqlalchemy import null
+from sqlalchemy.engine import cursor
 
 from gptrando.flare_widget import FlareTextExtension
 from gptrando.inline_search_manager import InlineSearchManager
+from gptrando.theme_manager import PaletteManager, ThemeManager
+
+
+class ScreenUnits:
+    pass
+
+
+class Relief:
+    pass
+
+
+class TakeFocusValue:
+    pass
 
 
 class MainEditor(tk.Frame):
 
-    def __init__(self, master: tk.Misc | None = None, cnf: dict[str, Any] | None = None, *, background: str = ...,
-                 bd: _ScreenUnits = ..., bg: str = ..., border: _ScreenUnits = ..., borderwidth: _ScreenUnits = ...,
-                 class_: str = ..., colormap: Literal["new", ""] | Misc = ..., container: bool = ...,
-                 cursor: _Cursor = ..., height: _ScreenUnits = ..., highlightbackground: str = ...,
-                 highlightcolor: str = ..., highlightthickness: _ScreenUnits = ..., name: str = ...,
-                 padx: _ScreenUnits = ..., pady: _ScreenUnits = ..., relief: _Relief = ...,
-                 takefocus: _TakeFocusValue = ..., visual: str | tuple[str, int] = ..., width: _ScreenUnits = ...):
+    def __init__(self, main: tk.Misc | None = None, cnf: dict[str, Any] | None = None, *, background: str = ...,
+                 bd: ScreenUnits = ..., bg: str = ..., border: ScreenUnits = ..., border_width: ScreenUnits = ...,
+                 class_: str = ..., color_map: Literal["new", ""] | tk.Misc = ..., main_container: bool = ...,
+                 cursor: Cursor = ..., height: ScreenUnits = ..., highlight_background: str = ...,
+                 highlight_color: str = ..., highlight_thickness: ScreenUnits = ..., name: str = ...,
+                 x_value: ScreenUnits = ..., pady: ScreenUnits = ..., relief: Relief = ...,
+                 take_focus: TakeFocusValue = ..., visual: str | tuple[str, int] = ..., width: ScreenUnits = ...):
+        self.text_widget = self.set_text_widget()
+        self.palette_manager = PaletteManager()
+        self.parent = self.master = main
+        if cnf is None:
+            cnf = {}
+        super().__init__(main, cnf, null, background, bd, bg, border, border_width, class_, color_map, main_container,
+                         cursor, height, highlight_background, highlight_color, highlight_thickness, name, x_value, pady,
+                         relief, take_focus, visual, width)
+
+        self.text_area = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
+        self.theme_manager = ThemeManager()
+        self.inline_search_manager = InlineSearchManager()
+        self.flare_text_extension = FlareTextExtension(self.text_area)
+
+        self.setup_menu_bar()
+        self.setup_bindings()
+
+        self.text_area.pack(fill=tk.BOTH, expand=True)
+
+        self.parent = self.parent or self.master  # Use main as parent if not specified
+        self.palette_manager = PaletteManager(self.text_area)
+        self.theme_manager = ThemeManager()
+
+        self.text_area = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
+        self.text_area.pack(fill=tk.BOTH, expand=True)
+
+        self.flare_text_extension = FlareTextExtension(self.text_area)
+        self.inline_search_manager = InlineSearchManager()
+
+        self.setup_menu_bar()
+        self.setup_bindings()
+
+        self.text_area.pack(fill=tk.BOTH, expand=True)
+
+        self.parent = self.parent
+        self.palette = self.palette or {}
+        self.text_widget = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
+        self.text_widget.pack(fill=tk.BOTH, expand=True)
+
+        self.setup_text_formatting()
+        self.set_content(content)
+        self.apply_palette()
+
+        self.setup_text_formatting()
+        self.set_content(content)
+        self.apply_palette()
+
+    def init(self, parent, background=None, bd=None, bg=None, border=None, borderwidth=None, class_=None, height=None,
+             highlightbackground=None, highlightcolor=None, highlightthickness=None, padx=None, pady=None, relief=None,
+             takefocus=None, visual=None):
+        self.parent = parent
+        self.palette = self.palette or {}
+        self.text_widget = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
+        self.text_widget.pack(fill=tk.BOTH, expand=True)
+
+        self.setup_text_formatting()
+        self.set_content(content)
+        self.apply_palette()
+
+        self.setup_text_formatting()
+        self.set_content(content)
+        self.apply_palette()
+
         self.text_widget = self.set_text_widget()
         self.palette_manager = PaletteManager()
         self.parent = self.master = master
@@ -39,7 +125,7 @@ class MainEditor(tk.Frame):
 
         self.text_area.pack(fill=tk.BOTH, expand=True)
 
-        self.parent = self.parent or self.master  # Use master as parent if not specified
+        self.parent = self.parent or self.master  # Use main as parent if not specified
         self.parent.title("HEAT UP Editor")
         self.palette_manager = PaletteManager()
         self.theme_manager = ThemeManager(self.palette_manager)
@@ -55,24 +141,13 @@ class MainEditor(tk.Frame):
 
         self.text_area.pack(fill=tk.BOTH, expand=True)
 
-        self.parent = parent
-        self.palette = palette or {}
-        self.text_widget = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
-        self.text_widget.pack(fill=tk.BOTH, expand=True)
-
-        self.setup_text_formatting()
-        self.set_content(content)
-        self.apply_palette()
-
-        self.setup_text_formatting()
-        self.set_content(content)
-        self.apply_palette()
-
-    def init(self, parent):
-
-    super().init(parent)
+        self.parent = self.parent
+        self.palette = self.palette or {}
 
     def setup_menu_bar(self):  # Create the menu bar
+        """
+
+        """
         menubar = tk.Menu(self.parent)
         self.parent.config(menu=menubar)
 
@@ -132,16 +207,6 @@ class MainEditor(tk.Frame):
 
     def show_about_dialog(self):  # Display the about dialog
         messagebox.showinfo("About", "HEAT UP Editor\nVersion 1.0\n\nA simple text editor with advanced features.")
-
-    def open_file(self):  # Open a file dialog to select a file to open
-        if file_path := filedialog.askopenfilename(
-                filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
-        ):
-            with open(file_path, "r") as file:
-                content = file.read()
-            self.text_area.delete("1.0", tk.END)
-            self.text_area.insert("1.0", content)
-            self._display_message(f"Opened file: {file_path}")
 
     def save_file(self):  # Open a file dialog to save the current file
         if file_path := filedialog.asksaveasfilename(
@@ -320,13 +385,12 @@ class MainEditor(tk.Frame):
 
         return python_code, markdown_code
 
-
     def open_file(self):
         """
         Opens a file dialog to select a file to open.
         """
         if file_path := filedialog.askopenfilename(
-            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+                filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
         ):
             with open(file_path, "r") as file:
                 content = file.read()
@@ -339,7 +403,7 @@ class MainEditor(tk.Frame):
         Opens a file dialog to save the current file.
         """
         if file_path := filedialog.asksaveasfilename(
-            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+                filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
         ):
             with open(file_path, "w") as file:
                 file.write(self.text_area.get("1.0", tk.END).strip())
@@ -349,8 +413,9 @@ class MainEditor(tk.Frame):
         self.text_area.bind("<Control-f>", self.inline_search_manager.prompt_search_query)
 
     def open_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
-        if file_path:
+        if file_path := filedialog.askopenfilename(
+                filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+        ):
             with open(file_path, "r") as file:
                 content = file.read()
             self.text_area.delete("1.0", tk.END)

@@ -1,5 +1,12 @@
 import tkinter as tk
 from tkinter import font
+from typing import Any, Literal
+
+from PIL.Image import new
+from colorama import Cursor
+from pyasn1.compat.octets import null
+
+from gptrando.main import TakeFocusValue, Relief
 
 
 class FlareTextExtension(tk.Frame):
@@ -7,17 +14,50 @@ class FlareTextExtension(tk.Frame):
     An advanced Flare widget that provides a rich set of features for content display and interaction within the HEAT UP editor.
     """
 
+    def __init__(
+            self,
+            master: tk.Misc | None = None,
+            cnf=,
+            *,
+            background: str = ...,
+            bd: tk = ...,
+            bg: str = ...,
+            border: tk = ...,
+            borderwidth: tk = ...,
+            cursor: Cursor = ...,
+            height: tk = ...,
+            highlight_background: str = ...,
+            highlight_color: str = ...,
+            highlight_thickness: tk = ...,
+            name: str = 1,
+            x_value: tk = 1,
+            y_value: tk = 1,
+            relief: Relief = 1,
+            x_focus_val: TakeFocusValue = 1,
+            width: tk = 0.5,
+    highlight_color=0.2, highlight_background=0.1, highlight_thicknes=0.5, name='FlareTextExtension', x_value=0, y_value=0, relief='flat', takefocus=1, visual=None, width=0):
+        super().__init__(master, cnf, null, background, bd, bg, border, borderwidth, class_, colormap, container,
+                         cursor, height, highlight_background, highlight_color, highlight_thicknes, name, x_value, y_value,
+                         relief, takefocus, visual, width)
+        self.x_focus_val = x_focus_val
+        self.visual = visual
+        self.take_focus = takefocus
+        self.highlight_thickness = highlight_thickness
+        self.highlight_color = highlight_color
+        self.highlight_background = highlight_background
+        if cnf is None:
+            cnf = {}
+        self.text_widget = 1
+        self.parent = 1
+        self.palette = 1
+
     def init(self, parent, content='', palette=None, **kwargs):
         super().init(parent, **kwargs)
 
         self.parent = parent
         self.palette = palette or {}
         self.text_widget = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
-        self.text_widget.pack(fill=tk.BOTH, expand=True)
-
-        self.setup_text_formatting()
-        self.set_content(content)
-        self.apply_palette()
+        self.text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
     def setup_text_formatting(self):
         """
