@@ -4,8 +4,25 @@ from tkinter import font
 
 
 class SearchBar(tk.Entry):  # Custom search bar widget
+    """
+    A custom search bar widget that can be used to search for text in a text widget.
+
+    Args:
+        master: The parent widget.
+        **kwargs: Additional keyword arguments to pass to the parent widget.
+
+    Attributes:
+        search_bar: The search bar widget.
+        toggle_formatting: A method that can be used to toggle text formatting.
+        close_search_bar: A method that can be used to close the search bar.
+        close: A method that can be used to close the search bar.
+        search_index: The index of the current search query.
+        search_highlights: A list of tuples containing the start and end indices of search highlights.
+    """
+
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+
         self.search_bar = tk.Entry(self, font=font.Font(family='Courier New', size=12), width=30)
         self.toggle_formatting = self.toggle_formatting
         self.close_search_bar = self.pack_forget
@@ -20,6 +37,73 @@ class SearchBar(tk.Entry):  # Custom search bar widget
 
         self.master.protocol("WM_DELETE_WINDOW", self.close)
         self.master.mainloop()
+
+        self.text_area = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
+        self.theme_manager = ThemeManager(self.palette_manager)
+        self.inline_search_manager = InlineSearchManager(self.text_area)
+        self.flare_text_extension = FlareTextExtension(self.text_area)
+
+        self.setup_menu_bar()
+        self.setup_bindings()
+
+        self.text_area.pack(fill=tk.BOTH, expand=True)
+
+        self.parent = self.parent or self.master  # Use master as parent if not specified
+        self.parent.title("HEAT UP Editor")
+        self.palette_manager = PaletteManager()
+        self.theme_manager = ThemeManager(self.palette_manager)
+
+        self.text_area = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
+        self.text_area.pack(fill=tk.BOTH, expand=True)
+
+        self.flare_text_extension = FlareTextExtension(self.text_area)
+        self.inline_search_manager = InlineSearchManager(self.text_area)
+
+        self._display_message("Ready")
+
+    def setup_menu_bar(self):
+        menubar = tk.Menu(self.parent)
+        self.parent.config(menu=menubar)
+
+        file_menu = tk.Menu(menubar)
+        menubar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="Open", command=self.open_file)
+        file_menu.add_command(label="Save", command=self.save_file)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.parent.quit)
+
+        edit_menu = tk.Menu(menubar)
+        menubar.add_cascade(label="Edit", menu=edit_menu)
+        edit_menu.add_command(label="Undo", command=self.text_area.undo)
+        edit_menu.add_command(label="Redo", command=self.text_area.redo)
+        edit_menu.add_separator()
+        edit_menu.add_command(label="Cut", command=self.text_area.cut)
+        edit_menu.add_command(label="Copy", command=self.text_area.copy)
+        edit_menu.add_command(label="Paste", command=self.text_area.paste)
+
+        theme_menu = tk.Menu(menubar)
+        menubar.add_cascade(label="Themes", menu=theme_menu)
+        theme_menu.add_command(label="Toggle Theme", command=self.toggle_theme)
+        theme_menu.add_command(label="Toggle Palette", command=self.toggle_palette)
+
+        search_menu = tk.Menu(menubar)
+        menubar.add_cascade(label="Search", menu=search_menu)
+        search_menu.add_command(label="Toggle Inline Search", command=self.toggle_inline_search)
+        search_menu.add_command(label="Toggle Flare Text", command=self.toggle_flare_text)
+
+        self._display_message("Ready")
+
+    def setup_bindings(self):
+        self.text_area.bind("<Control-f>", self.inline_search_manager.prompt_search_query)
+        self.text_area.bind("<Control-n>", self.inline_search_manager.find_next)
+        self.text_area.bind("<Control-p>", self.inline_search_manager.find_previous)
+
+        self.text_area.bind("<Control-s>", self.save_file)
+        self.text_area.bind("<Control-o>", self.open_file)
+
+        self.text_area.bind("<Control-q>", self.close)
+
+
 
     def setup_search_bar(self):
         """

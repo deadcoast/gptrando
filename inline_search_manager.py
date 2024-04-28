@@ -41,6 +41,24 @@ class InlineSearchManager:
                 self.search_index = "1.0"
                 self._display_message("No more occurrences found.")
 
+    def find_next(self):
+        """
+        Finds the next occurrence of the search query and highlights it.
+        """
+        if self.search_query:
+            self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex=tk.END)
+            if self.search_index:
+                self.add_search_highlight(
+                    self.search_index,
+                    f"{self.search_index}+{len(self.search_query)}c",
+                )
+                self.search_index = self.text_widget.index(
+                    f"{self.search_index}+{len(self.search_query)}c"
+                )
+            else:
+                self.search_index = "1.0"
+                self._display_message("No more occurrences found.")
+
     def find_previous(self):
         if self.search_query:
             self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex="1.0",
