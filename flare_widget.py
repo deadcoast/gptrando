@@ -3,7 +3,9 @@ from tkinter import font
 from typing import Any, Literal
 
 from PIL.Image import new
+from PIL.ImageColor import colormap
 from colorama import Cursor
+from fig import container
 from pyasn1.compat.octets import null
 
 from gptrando.main import TakeFocusValue, Relief
@@ -17,7 +19,7 @@ class FlareTextExtension(tk.Frame):
     def __init__(
             self,
             master: tk.Misc | None = None,
-            cnf=,
+            cnf=None,
             *,
             background: str = ...,
             bd: tk = ...,
@@ -26,30 +28,35 @@ class FlareTextExtension(tk.Frame):
             borderwidth: tk = ...,
             cursor: Cursor = ...,
             height: tk = ...,
-            highlight_background: str = ...,
-            highlight_color: str = ...,
-            highlight_thickness: tk = ...,
-            name: str = 1,
-            x_value: tk = 1,
-            y_value: tk = 1,
-            relief: Relief = 1,
             x_focus_val: TakeFocusValue = 1,
-            width: tk = 0.5,
-    highlight_color=0.2, highlight_background=0.1, highlight_thicknes=0.5, name='FlareTextExtension', x_value=0, y_value=0, relief='flat', takefocus=1, visual=None, width=0):
+            visual=None,
+            class_=None):
+        """
+        Initialize the FlareTextExtension object.
+
+        Args:
+            master (tk.Misc | None): The master widget.
+            cnf: The configuration options.
+            background (str): The background color.
+            bd (tk): The border width.
+            bg (str): The background color.
+            border (tk): The border style.
+            borderwidth (tk): The border width.
+            cursor (Cursor): The cursor style.
+            height (tk): The height of the widget.
+            x_focus_val (TakeFocusValue): The x focus value.
+            visual: The visual style.
+            class_: The class style.
+        """
         super().__init__(master, cnf, null, background, bd, bg, border, borderwidth, class_, colormap, container,
-                         cursor, height, highlight_background, highlight_color, highlight_thicknes, name, x_value, y_value,
-                         relief, takefocus, visual, width)
+                         cursor, height)
         self.x_focus_val = x_focus_val
         self.visual = visual
-        self.take_focus = takefocus
-        self.highlight_thickness = highlight_thickness
-        self.highlight_color = highlight_color
-        self.highlight_background = highlight_background
         if cnf is None:
             cnf = {}
-        self.text_widget = 1
-        self.parent = 1
-        self.palette = 1
+        self.text_widget = None
+        self.parent = None
+        self.palette = None
 
     def init(self, parent, content='', palette=None, **kwargs):
         super().init(parent, **kwargs)
