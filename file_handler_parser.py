@@ -39,7 +39,7 @@ def save_code(self, code, file_path):
 
     print(f"Saved code to {file_path}")
 
-    self._display_message(f"Saved code to {file_path}")
+    self.display_message(f"Saved code to {file_path}")
 
 
 def extract_code(self, content: str) -> tuple:

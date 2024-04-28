@@ -1,6 +1,6 @@
 import logging
 import tkinter as tk
-from tkinter import font
+from tkinter import font, messagebox
 
 from gptrando.main import self
 
@@ -44,9 +44,7 @@ class InlineSearchManager:
                 )
             else:
                 self.search_index = "1.0"
-                self._display_message("No more occurrences found.")
-
-
+                self.display_message("No more occurrences found.")
 
     def find_previous(self):
         if self.search_query:
@@ -62,7 +60,7 @@ class InlineSearchManager:
                 )
             else:
                 self.search_index = tk.END
-                self._display_message("No more occurrences found.")
+                self.display_message("No more occurrences found.")
 
     def perform_search(self, event=None):
         self.search_query = self.search_bar.get()
@@ -145,7 +143,7 @@ class InlineSearchManager:
         self.apply_palette()
 
         self.apply_palette_and_init()
-        self._display_message("Ready")
+        self.display_message("Ready")
 
         self.text_widget.focus_set()
 
@@ -193,8 +191,165 @@ class InlineSearchManager:
         pass
 
     def perform_search(self, event):
+        """
+        Perform a search based on the given event.
+        """
+        # Suggestion 2: Clear any previous search highlights
+        self.clear_search_highlights()
 
-        pass
+        # Suggestion 3: Get the search query from the search bar
+        self.search_query = self.search_bar.get()
+
+        # Suggestion 6: Maintain search index state across multiple searches
+        if not self.search_index:
+            self.search_index = "1.0"
+
+        # Suggestion 5: Handle exceptions during the search process
+        try:
+            # Suggestion 4: Call find_next or find_previous based on user's choice
+            if self.search_query:
+                if self.search_direction == "next":
+                    self.find_next()
+                elif self.search_direction == "previous":
+                    self.find_previous()
+        except tk.TclError:
+            # Suggestion 7: Handle exceptions during the search process
+        except Exception:
+
+            # Suggestion 8: Handle exceptions during the search process
+            messagebox.showerror("Error", "An error occurred during search.")
+
+            # Suggestion 9: Log the error details
+            logging.error("Error occurred during search", exc_info=True)
+
+            # Suggestion 10: Display an error message to the user
+            messagebox.showerror("Error", "An error occurred during search. Please try again.")
+
+            # Suggestion 11: Clear any previous search highlights
+            self.clear_search_highlights()
+
+            # Suggestion 12: Reset the search index to 1.0
+            self.search_index = "1.0"
+
+            # Suggestion 13: Reset the search query to an empty string
+            self.search_query = ""
+
+            # Suggestion 14: Reset the search direction to "next"
+            self.search_direction = "next"
+
+            # Suggestion 15: Call find_next or find_previous based on user's choice
+            if self.search_query:
+                if self.search_direction == "next":
+                    self.find_next()
+                elif self.search_direction == "previous":
+                    self.find_previous()
+
+        # Suggestion 16: Call find_next or find_previous based on user's choice
+        if self.search_query:
+            if self.search_direction == "next":
+                self.find_next()
+            elif self.search_direction == "previous":
+                self.find_previous()
+
+    def setup_bindings(self):
+        self.search_bar.bind("<Return>", self.perform_search)
+        self.text_widget.bind("<Control-f>", self.prompt_search_query)
+        self.text_widget.bind("<Control-g>", self.find_next)
+        self.text_widget.bind("<Control-Shift-g>", self.find_previous)
+
+    def close(self, event=None):
+        self.master.destroy()
+
+    def clear_search_highlights(self):
+        """
+        Clears the search highlights.
+        """
+        if self.search_highlights:
+            self.text_widget.tag_remove("highlight", "1.0", tk.END)
+            self.search_highlights = []
+
+    def add_search_highlight(self, start_index, end_index):
+        """
+        Adds a highlight to the search results.
+        """
+        self.text_widget.add_tag("highlight", start_index, end_index)
+        self.text_widget.tag_config("highlight", background="yellow")
+        self.search_highlights.append((start_index, end_index))
+
+    def perform_search(self, event=None):
+        """
+        Performs the inline search based on the user's query.
+        """
+        self.search_query = self.search_entry.get()
+        self.search_index = "1.0"
+        self.clear_search_highlights()
+        self.bar_find_next()
+
+    def find_next(self):
+        """
+        Finds the next occurrence of the search query and highlights it.
+        """
+        if self.search_query:
+            self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex=tk.END)
+            if self.search_index:
+                self.add_search_highlight(
+                    self.search_index,
+                    f"{self.search_index}+{len(self.search_query)}c",
+                )
+                self.search_index = self.text_widget.index(
+                    f"{self.search_index}+{len(self.search_query)}c"
+                )
+            else:
+                self.search_index = "1.0"
+                self.display_message("No more occurrences found.")
+
+    def find_previous(self):
+        """
+        Finds the previous occurrence of the search query and highlights it.
+        """
+        if self.search_query:
+            self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex="1.0",
+                                                        backwards=True)
+            if self.search_index:
+                self.add_search_highlight(
+                    self.search_index,
+                    f"{self.search_index}+{len(self.search_query)}c",
+                )
+                self.search_index = self.text_widget.index(
+                    f"{self.search_index}+{len(self.search_query)}c"
+                )
+            else:
+                self.search_index = tk.END
+                self.display_message("No more occurrences found.")
+
+    def display_message(self, message):
+        self.status_bar.config(text=message)
+
+    def setup_search_bar(self):
+        """
+        Configures the search bar widget.
+        """
+        self.search_bar = tk.Entry(self, font=font.Font(family='Courier New', size=12), width=30)
+        self.search_bar.pack(side=tk.TOP, fill=tk.X)
+        self.search_bar.bind("<Return>", self.perform_search)
+    def close(self):
+        self.master.destroy()
+
+    def clear_search_highlights(self):
+        """
+        Clears the search highlights.
+        """
+        if self.search_highlights:
+            self.text_widget.tag_remove("highlight", "1.0", tk.END)
+            self.search_highlights = []
+
+    def add_search_highlight(self, start_index, end_index):
+        """
+        Adds a highlight to the search results.
+        """
+        self.text_widget.add_tag("highlight", start_index, end_index)
+        self.text_widget.tag_config("highlight", background="yellow")
+        self.search_highlights.append((start_index, end_index))
 
 
 def init(self, text_widget):
@@ -295,7 +450,7 @@ def setup_inline_search_manager(self):
     self.apply_palette()
 
     self.apply_palette_and_init()
-    self._display_message("Ready")
+    self.display_message("Ready")
 
     self.text_widget.focus_set()
 

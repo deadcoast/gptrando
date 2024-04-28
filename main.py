@@ -214,7 +214,7 @@ class MainEditor(tk.Frame):
         ):
             with open(file_path, "w") as file:
                 file.write(self.text_area.get("1.0", tk.END).strip())
-            self._display_message(f"Saved file: {file_path}")
+            self.display_message(f"Saved file: {file_path}")
 
     def _display_message(self, message):  # Display a message in the status bar
         self.parent.status_bar.config(text=message)  # Update the status bar text
@@ -396,7 +396,7 @@ class MainEditor(tk.Frame):
                 content = file.read()
             self.text_area.delete("1.0", tk.END)
             self.text_area.insert("1.0", content)
-            self._display_message(f"Opened file: {file_path}")
+            self.display_message(f"Opened file: {file_path}")
 
     def save_file(self):
         """
@@ -407,7 +407,7 @@ class MainEditor(tk.Frame):
         ):
             with open(file_path, "w") as file:
                 file.write(self.text_area.get("1.0", tk.END).strip())
-            self._display_message(f"Saved file: {file_path}")
+            self.display_message(f"Saved file: {file_path}")
 
     def setup_bindings(self):
         self.text_area.bind("<Control-f>", self.inline_search_manager.prompt_search_query)
@@ -420,14 +420,14 @@ class MainEditor(tk.Frame):
                 content = file.read()
             self.text_area.delete("1.0", tk.END)
             self.text_area.insert("1.0", content)
-            self._display_message(f"Opened file: {file_path}")
+            self.display_message(f"Opened file: {file_path}")
 
     def save_file(self):
         file_path = filedialog.asksaveasfilename(filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
         if file_path:
             with open(file_path, "w") as file:
                 file.write(self.text_area.get("1.0", tk.END).strip())
-            self._display_message(f"Saved file: {file_path}")
+            self.display_message(f"Saved file: {file_path}")
 
     def _display_message(self, message):
         self.parent.status_bar.config(text=message)

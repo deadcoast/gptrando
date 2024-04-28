@@ -207,24 +207,32 @@ class ThemeManager:
         """
         logging.info("Search functionality invoked")  # Suggestion 1
         try:
-            # Add code to display a message or change the UI to indicate search functionality invocation
-            event_type = event.type  # Suggestion 5
-            if event_type == "search":
-                print("Search functionality invoked")
-            elif event_type == "click":
-                print("Clicked on search button")
-            else:
-                print("Unknown event type")
-        
-            # Update UI to highlight the searched text
-            self.highlight_searched_text()  # Suggestion 6
-        
-            return "Search functionality invoked successfully."  # Suggestion 3
+            return self.search_button_depressed(event)
         except Exception as e:
             logging.error(f"Error occurred during search functionality: {e}")  # Suggestion 2
             # Handle the exception appropriately, e.g. display an error message to the user
-    
+
         self.clear_search_feedback()  # Suggestion 7
+
+    def search_button_depressed(self, event):
+        # Add code to display a message or change the UI to indicate search functionality invocation
+        event_type = event.type  # Suggestion 5
+        if event_type == "click":
+            print("Clicked on search button")
+        elif event_type == "search":
+            print("Search functionality invoked")
+        else:
+            print("Unknown event type")
+
+        # Update UI to highlight the searched text
+        self.highlight_searched_text("searched_text")
+        self.search_index = "1.0"
+        self.clear_search_highlights()
+        self.search_index = "1.0"
+        self.clear_search_highlights()
+        self.search_index = "1.0"
+        self.clear_search_highlights()
+        return "Search functionality invoked successfully."  # Suggestion 3
 
     def highlight_searched_text(self, search_text):
         """
