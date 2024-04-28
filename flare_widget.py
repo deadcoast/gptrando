@@ -50,17 +50,22 @@ class FlareTextExtension(tk.Frame):
             font_size: The font size to use.
             **kwargs: Additional keyword arguments.
         """
-        super().init(parent, **kwargs)
+        super().__init__(parent, **kwargs)
 
         self.set_parent(parent)
         self.set_palette(palette)
         self.create_text_widget(font_family, font_size, **kwargs)
+        self.set_content(content)  # Set the content to the text_widget
         self.place_text_widget()
 
-        try:
-            self.text_widget.grid(row=0, column=0, sticky="nsew")
-        except tk.TclError as e:
-            logging.error(f'Error creating or placing text widget: {e}')
+        if self.text_widget is not None:
+            try:
+                self.text_widget.grid(row=0, column=0, sticky="nsew")
+            except tk.TclError as e:
+                logging.error(f'Error creating or placing text widget: {e}')
+                raise
+
+        return self
 
     def set_parent(self, parent):
         """
@@ -185,7 +190,7 @@ class FlareTextExtension(tk.Frame):
         self.text_widget.grid_columnconfigure(4, weight=0)
         self.text_widget.grid_rowconfigure(5, weight=0)
         self.text_widget.grid_columnconfigure(5, weight=0)
-        
+
     def set_focus(self):
         """
         Sets the focus on the Flare widget.
