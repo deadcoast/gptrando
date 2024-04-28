@@ -74,7 +74,7 @@ class InlineSearchManager:
         self.status_bar.config(text=message)
 
     def add_search_highlight(self, start, end):
-        self.text_widget.tag_add("search_highlight", start, end)
+        self.text_widget.add_tag("search_highlight", start, end)
         self.search_highlights.append((start, end))
 
     def clear_search_highlights(self):
@@ -230,7 +230,7 @@ def add_search_highlight(self, start_index, end_index):
     """
     Adds a highlight to the search results.
     """
-    self.text_widget.tag_add("highlight", start_index, end_index)
+    self.text_widget.add_tag("highlight", start_index, end_index)
     self.text_widget.tag_config("highlight", background="yellow")
     self.search_highlights.append((start_index, end_index))
 

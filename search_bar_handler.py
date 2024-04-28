@@ -1,16 +1,11 @@
-
 import tkinter as tk
 from tkinter import font
 
-from gptrando.theme_manager import ThemeManager
-from gptrando.inline_search_manager import InlineSearchManager
-from gptrando.flare_text_extension import FlareTextExtension
-from gptrando.palette_manager import PaletteManager
+from fig.cli import formatter
 
-from .theme_manager import ThemeManager
 from .inline_search_manager import InlineSearchManager
-from .FlareTextExtension import FlareTextExtension
-from .palette_manager import PaletteManager
+from .theme_manager import theme_manager
+from .theme_manager import ThemeManager
 
 
 class NoMoreOccurrencesException:
@@ -27,6 +22,28 @@ class NoMoreOccurrencesException:
 
     def __call__(self):
         return self.message
+
+
+def emit_text_widget_set_event(callback=None):
+    """
+    Emits a text widget set event and returns a boolean indicating the success of the event emission or callback function call.
+
+    This method is responsible for emitting an event or calling a callback function after the text widget is set. It should be called after setting the text widget to perform any necessary actions or updates related to the text widget.
+
+    Args:
+        callback (function, optional): A callback function to be called after the text widget is set. Defaults to None.
+
+    Returns:
+        bool: True if the event was successfully emitted or the callback function was successfully called, False otherwise.
+    """
+    try:
+        # code to emit the event or call the callback function
+        if callback:
+            callback()
+        return True
+    except Exception as e:
+        print(f"Error occurred during emission of event or calling of callback function: {e}")
+        return False
 
 
 class SearchBar(tk.Entry):  # Custom search bar widget
@@ -49,8 +66,10 @@ class SearchBar(tk.Entry):  # Custom search bar widget
     def __init__(self, master, edit_menu=None, menubar=None, **kwargs):
         super().__init__(master, **kwargs)
 
+        self.menubar = tk.Menu(self)
+        self.palette_manager = theme_manager()
         self.search_bar = tk.Entry(self, font=font.Font(family='Courier New', size=12), width=30)
-        self.toggle_formatting = self.toggle_formatting
+        self.toggle_formatting = formatter.toggle_formatting
         self.close_search_bar = self.pack_forget
         self.close = self.close_search_bar
         self.search_index = 1.0
@@ -61,8 +80,8 @@ class SearchBar(tk.Entry):  # Custom search bar widget
         self.setup_text_formatting()
         self.setup_bindings()
 
-        self.master.protocol("WM_DELETE_WINDOW", self.close)
-        self.master.mainloop()
+        self.main.protocol("WM_DELETE_WINDOW", self.close)
+        self.main.mainloop()
 
         self.text_area = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
         self.theme_manager = ThemeManager(self.palette_manager)
@@ -76,7 +95,7 @@ class SearchBar(tk.Entry):  # Custom search bar widget
 
         self.parent = self.parent or self.master  # Use main as parent if not specified
         self.parent.title("HEAT UP Editor")
-        self.palette_manager = PaletteManager()
+        self.palette_manager = theme_manager()
         self.theme_manager = ThemeManager(self.palette_manager)
 
         self.text_area = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
@@ -244,18 +263,49 @@ class SearchBar(tk.Entry):  # Custom search bar widget
 
     def set_text_widget(self, text_widget):
         """
-        Sets the text widget to be searched.
+        Sets the text widget to be searched and validates the text_widget argument.
+        Clears any existing state related to the previous text_widget.
+        Emits an event or calls a callback function after the text_widget is set.
+        Returns self to allow for method chaining.
         """
-        self.text_widget = text_widget
+        if not isinstance(text_widget, tk.Text):
+            raise ValueError("Invalid text_widget. Expected a tk.Text object.")
+    
+        try:
+            self.clear_search_highlights()  # Clear existing search highlights
+            self.search_index = "1.0"  # Reset search index
+            self.text_widget = text_widget
+            emit_text_widget_set_event()  # or self.call_text_widget_set_callback()
+        except Exception as e:
+            # Handle the exception here (e.g. log the error, display an error message, etc.)
+            print(f"Error occurred during assignment of self.text_widget: {e}")
+    
+        return self
 
     def set_palette(self, palette):
         """
         Applies the specified color palette to the search bar.
         """
-        self.configure(
-            background=palette.get('secondary', '#303030'),
-            foreground=palette.get('primary', '#505050'),
-        )
+        DEFAULT_BACKGROUND_COLOR = '#303030'
+        DEFAULT_FOREGROUND_COLOR = '#505050'
+
+        background_color = palette.get('secondary', DEFAULT_BACKGROUND_COLOR)
+        foreground_color = palette.get('primary', DEFAULT_FOREGROUND_COLOR)
+
+        if isinstance(palette, dict):
+            try:
+                self.configure(
+                    background=background_color,
+                    foreground=foreground_color,
+                )
+            except KeyError:
+                # Handle case where palette dictionary does not contain expected keys
+                self.configure(
+                    background=DEFAULT_BACKGROUND_COLOR,
+                    foreground=DEFAULT_FOREGROUND_COLOR,
+                )
+        else:
+            raise ValueError("Invalid palette. Expected a dictionary.")
 
     def find_previous(self):
         """
@@ -273,7 +323,53 @@ class SearchBar(tk.Entry):  # Custom search bar widget
         else:
             self.search_index = "1.0"
             self._display_message("No more occurrences found.")
+    
+    @staticmethod
+    def validate_input_parameters(tag, start, end):
+        error_messages = []
+        if not isinstance(tag, str):
+            error_messages.append("Invalid tag. Expected a string for parameter 'tag'.")
+        if not isinstance(start, str):
+            error_messages.append("Invalid start index. Expected a string for parameter 'start'.")
+        if not isinstance(end, str):
+            error_messages.append("Invalid end index. Expected a string for parameter 'end'.")
+        if error_messages:
+            raise ValueError("\n".join(error_messages))
+        return True
 
-    def tag_add(self, param, start, end):
-        pass
+    def add_tag(self, text_widget, tag, start, end):
+        """
+        Adds a tag to the specified text widget from the start index to the end index.
+
+        :param text_widget: The text widget to add the tag to.
+        :param tag: The tag to be added.
+        :param start: The start index.
+        :param end: The end index.
+        :return: The added tag if the operation was successful.
+        :raises ValueError: If the tag, start index, or end index is invalid.
+        """
+        self.validate_input_parameters(tag, start, end)
+
+        try:
+            text_widget.tag_add(tag, start, end)
+            return tag
+        except (tk.TclError, ValueError) as e:
+            raise ValueError(f"An error occurred: {e}") from e
+
+    def setup_menu_bar(self):
+        """
+        Sets up the menu bar for the application.
+        """
+        try:
+            edit_menu = tk.Menu(self.menubar)
+            self.menubar.add_cascade(label="Edit", menu=edit_menu)
+            edit_menu.add_command(label="Undo", command=self.text_area.undo)
+            edit_menu.add_command(label="Redo", command=self.text_area.redo)
+            edit_menu.add_separator()
+            edit_menu.add_command(label="Cut", command=self.text_area.cut)
+            edit_menu.add_command(label="Copy", command=self.text_area.copy)
+            edit_menu.add_command(label="Paste", command=self.text_area.paste)
+        except Exception as e:
+            # handle the exception
+            print(f"An error occurred: {e}")
         

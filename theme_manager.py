@@ -75,6 +75,12 @@ class ThemeManager:
     """
 
     def __init__(self):
+        self.hide_search_bar = None
+        self.find_previous = None
+        self.find_next = None
+        self.perform_search = None
+        self.inline_search_manager = InlineSearchManager()
+        self.prompt_search_query = self.inline_search_manager.prompt_search_query
         self.search_index = 1.0
         self.search_highlights = []
         self.search_close_button = tk.Button()
@@ -131,6 +137,35 @@ class ThemeManager:
         Binds keyboard shortcuts for invoking the inline search functionality.
         """
         self.text_widget.bind("<Control-f>", self.prompt_search_query)
+
+    def setup_menu_bar(self):
+        pass
+
+    def init(self):
+        pass
+
+    def setup_inline_search_manager(self):
+        pass
+
+    def load_snippets(self):
+        pass
+
+    def save_snippets(self):
+        pass
+
+    def close(self):
+        pass
+
+    def quit(self):
+        pass
+
+    def mainloop(self):
+        pass
+
+    def destroy(self):
+        pass
+
+
 def padding(self, PADDING_X=None, PADDING_Y=None):
         """
         Adds padding to the search bar.
@@ -145,7 +180,211 @@ def padding(self, PADDING_X=None, PADDING_Y=None):
         """
         Initializes the InlineSearchManager.
         """
-        self.inline_search_manager = InlineSearchManager(text_widget=self.text_widget)
+        self.inline_search_manager = InlineSearchManager()
+
+        self.inline_search_manager.init(self.text_widget)
+
+        self.inline_search_manager.setup_bindings()
+
+        self.inline_search_manager.pack(side=tk.TOP, fill=tk.X, expand=True)
+
+        self.inline_search_manager.apply_palette_and_init()
+
+        self.inline_search_manager.show_search_bar()
+
+        self.hide_search_bar = self.inline_search_manager.hide_search_bar
+        self.find_previous = self.inline_search_manager.find_previous
+        self.find_next = self.inline_search_manager.find_next
+        self.perform_search = self.inline_search_manager.perform_search
+
+        self.prompt_search_query = self.inline_search_manager.prompt_search_query
+
+        self.inline_search_manager.pack(side=tk.TOP, fill=tk.X, expand=True)
+
+        self.inline_search_manager.apply_palette_and_init()
+
+        self.inline_search_manager.show_search_bar()
+
+        self.hide_search_bar = self.inline_search_manager.hide_search_bar
+        self.find_previous = self.inline_search_manager.find_previous
+        self.find_next = self.inline_search_manager.find_next
+        self.perform_search = self.inline_search_manager.perform_search
+
+        self.prompt_search_query = self.inline_search_manager.prompt_search_query
+
+        self.inline_search_manager.pack(side=tk.TOP, fill=tk.X, expand=True)
+
+        self.inline_search_manager.apply_palette_and_init()
+
+        self.inline_search_manager.show_search_bar()
+
+        self.hide_search_bar = self.inline_search_manager.hide_search_bar
+        self.find_previous = self.inline_search_manager.find_previous
+        self.find_next = self.inline_search_manager.find_next
+        self.perform_search = self.inline_search_manager.perform_search
+
+        self.prompt_search_query = self.inline_search_manager.prompt_search_query
+
+        self.inline_search_manager.pack(side=tk.TOP, fill=tk.X, expand=True)
+
+        self.inline_search_manager.apply_palette_and_init()
+
+        self.inline_search_manager.show_search_bar()
+
+        self.hide_search_bar = self.inline_search_manager.hide_search_bar
+        self.find_previous = self.inline_search_manager.find_previous
+        self.find_next = self.inline_search_manager.find_next
+        self.perform_search = self.inline_search_manager.perform_search
+
+        self.prompt_search_query = self.inline_search_manager.prompt_search_query
+
+        self.inline_search_manager.pack(side=tk.TOP, fill=tk.X, expand=True)
+
+        self.inline_search_manager.apply_palette_and_init()
+
+        self.inline_search_manager.show_search_bar()
+
+    def load_snippets(self):
+        pass
+
+    def save_snippets(self):
+        pass
+
+    def close(self):
+        pass
+
+    def quit(self):
+        pass
+
+    def mainloop(self):
+        pass
+
+    def destroy(self):
+        pass
+
+    def setup_search_bar(self):
+        """
+        Initializes the search bar.
+        """
+        self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
+
+        self.search_bar.bind("<Return>", self.perform_search)
+
+        self.search_bar.focus_set(
+            self.perform_search
+        )
+
+        self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
+
+        self.search_bar.bind("<Return>", self.perform_search)
+
+        self.search_bar.focus_set(
+            self.perform_search
+        )
+
+        self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
+
+        self.search_bar.bind("<Return>", self.perform_search)
+
+        self.search_bar.focus_set(
+            self.perform_search
+        ),
+
+        self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5),
+
+        self.search_bar.bind("<Return>", self.perform_search),
+
+        self.search_bar.focus_set(
+            self.perform_search
+        ),
+
+        self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5),
+
+        self.search_bar.bind("<Return>", self.perform_search),
+
+        self.search_bar.focus_set(
+            self.perform_search
+        ),
+
+        self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5),
+
+        self.search_bar.bind("<Return>", self.perform_search),
+
+        self.search_bar.focus_set(
+            self.perform_search
+        ),
+
+    def setup_snippets(self):
+        """
+        Initializes the FlareTextExtension.
+        """
+        self.snippets = FlareTextExtension(),
+
+    def setup_text_area(self):
+        """
+        Sets up the text widget.
+        """
+        self.text_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=True),
+
+    def setup_menu_bar(self):
+        pass
+
+    def toggle_underline(self, event):
+        """
+        Toggles the underline formatting for the selected text.
+        :param self:
+        :param event:
+        :return:
+        """
+        self.toggle_formatting('underline'),
+
+    def toggle_strike(self, event):
+        """
+        Toggles the strike-through formatting for the selected text.
+        :param self:
+        :param event:
+        :return:
+        """
+        self.toggle_formatting('strike'),
+
+    def toggle_code(self, event):
+        """
+        Toggles the code formatting for the selected text.
+        :param self:
+        :param event:
+        :return:
+        """
+        self.toggle_formatting('code')
+,
+    def toggle_color(self, event):
+        """
+        Toggles the color formatting for the selected text.
+        """
+        self.toggle_formatting('color'),
+
+    def toggle_link(self, event):
+        """
+        Toggles the link formatting for the selected text.
+        """
+        self.toggle_formatting('link'),
+
+    def toggle_code_block(self, event):
+        """
+        Toggles the code block formatting for the selected text.
+        """
+        self.toggle_formatting('code_block'),
+
+    def toggle_quote(self, event):
+        """
+        Toggles the quote formatting for the selected text.
+        """
+        self.toggle_formatting('quote'),
+
+    def toggle_list(self, event):
+        """
+        Toggles the list formatting for the selected text.
+        """
+        self.toggle_formatting('list')
 
     def toggle_bold(self, event):
         """
@@ -167,7 +406,7 @@ def padding(self, PADDING_X=None, PADDING_Y=None):
         if self.text_widget.tag_names(start) and tag in self.text_widget.tag_names(start):
             self.text_widget.tag_remove(tag, start, end)
         else:
-            self.text_widget.tag_add(tag, start, end)
+            self.text_widget.add_tag(tag, start, end)
 
     def set_content(self, content):
         """
@@ -243,7 +482,7 @@ def padding(self, PADDING_X=None, PADDING_Y=None):
         if search_index is None or param is None:
             return False
         try:
-            self.text_widget.tag_add("search_highlight", search_index, param)
+            self.text_widget.add_tag("search_highlight", search_index, param)
         except Exception as e:
             logging.error("Error adding search highlight", exc_info=True)
         else:

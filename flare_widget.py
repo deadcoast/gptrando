@@ -1,14 +1,11 @@
 import tkinter as tk
+from collections import defaultdict
 from tkinter import font
-from typing import Any, Literal
 
-from PIL.Image import new
-from PIL.ImageColor import colormap
-from colorama import Cursor
-from fig import container
-from pyasn1.compat.octets import null
+from gptrando.main import TakeFocusValue
 
-from gptrando.main import TakeFocusValue, Relief
+TAG_BOLD = 'bold'
+TAG_ITALIC = 'italic'
 
 
 class FlareTextExtension(tk.Frame):
@@ -21,60 +18,40 @@ class FlareTextExtension(tk.Frame):
             master: tk.Misc | None = None,
             cnf=None,
             *,
-            background: str = ...,
-            bd: tk = ...,
-            bg: str = ...,
-            border: tk = ...,
-            borderwidth: tk = ...,
-            cursor: Cursor = ...,
-            height: tk = ...,
-            x_focus_val: TakeFocusValue = 1,
-            visual=None,
-            class_=None):
+            x_focus_val: TakeFocusValue = 1):
         """
         Initialize the FlareTextExtension object.
 
         Args:
             master (tk.Misc | None): The master widget.
             cnf: The configuration options.
-            background (str): The background color.
-            bd (tk): The border width.
-            bg (str): The background color.
-            border (tk): The border style.
-            borderwidth (tk): The border width.
-            cursor (Cursor): The cursor style.
-            height (tk): The height of the widget.
             x_focus_val (TakeFocusValue): The x focus value.
-            visual: The visual style.
-            class_: The class style.
         """
-        super().__init__(master, cnf, null, background, bd, bg, border, borderwidth, class_, colormap, container,
-                         cursor, height)
-        self.x_focus_val = x_focus_val
-        self.visual = visual
         if cnf is None:
             cnf = {}
+        super().__init__(master, **cnf)
+        self.x_focus_val = x_focus_val
         self.text_widget = None
         self.parent = None
         self.palette = None
+        self.bold_font = font.Font(family='Courier New', size=12, weight='bold')
+        self.italic_font = font.Font(family='Courier New', size=12, slant='italic')
 
     def init(self, parent, content='', palette=None, **kwargs):
         super().init(parent, **kwargs)
 
-        self.parent = parent
+        if parent is not None:
+            self.parent = parent
         self.palette = palette or {}
         self.text_widget = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
-        self.text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.text_widget.grid(row=0, column=0, sticky="nsew")
 
     def setup_text_formatting(self):
         """
         Configures the various text formatting options for the Flare widget.
         """
-        bold_font = font.Font(family='Courier New', size=12, weight='bold')
-        italic_font = font.Font(family='Courier New', size=12, slant='italic')
-
-        self.text_widget.tag_configure('bold', font=bold_font)
-        self.text_widget.tag_configure('italic', font=italic_font)
+        self.text_widget.tag_configure(TAG_BOLD, font=self.bold_font)
+        self.text_widget.tag_configure(TAG_ITALIC, font=self.italic_font)
 
         self.text_widget.bind('<Control-b>', self.toggle_bold)
         self.text_widget.bind('<Control-i>', self.toggle_italic)
@@ -83,43 +60,59 @@ class FlareTextExtension(tk.Frame):
         """
         Toggles the bold formatting for the selected text.
         """
-        self.toggle_formatting('bold')
+        self.toggle_formatting(TAG_BOLD)
 
     def toggle_italic(self, event):
         """
         Toggles the italic formatting for the selected text.
         """
-        self.toggle_formatting('italic')
+        self.toggle_formatting(TAG_ITALIC)
 
     def toggle_formatting(self, tag):
         """
         Generic method to toggle the specified text formatting tag.
         """
         start, end = self.text_widget.tag_ranges('sel')
-        if self.text_widget.tag_names(start) and tag in self.text_widget.tag_names(start):
-            self.text_widget.tag_remove(tag, start, end)
-        else:
-            self.text_widget.tag_add(tag, start, end)
+        if start is not None and end is not None:
+            if self.text_widget.tag_names(start) and tag in self.text_widget.tag_names(start):
+                self.text_widget.tag_remove(tag, start, end)
+            else:
+                self.text_widget.add_tag(tag, start, end)
 
     def set_content(self, content):
         """
         Sets the content of the Flare widget.
         """
-        self.text_widget.delete('1.0', tk.END)
-        self.text_widget.insert('1.0', content)
+        try:
+            self.text_widget.delete('1.0', tk.END)
+            self.text_widget.insert('1.0', content)
+        except Exception as e:
+            print(f'Error setting content: {e}')
 
     def get_content(self):
         """
         Retrieves the current content of the Flare widget.
         """
-        return self.text_widget.get('1.0', tk.END).strip()
+        try:
+            return self.text_widget.get('1.0', tk.END).strip()
+        except Exception as e:
+            print(f'Error getting content: {e}')
 
     def apply_palette(self):
         """
         Applies the specified color palette to the Flare widget.
         """
+        default_palette = defaultdict(lambda: '#303030')
+        default_palette.update(self.palette)
+
         self.text_widget.configure(
-            background=self.palette.get('secondary', '#303030'),
-            foreground=self.palette.get('primary', '#505050'),
-            insertbackground=self.palette.get('tertiary', '#202020')  # Cursor color for HEAT UP editor text widget
+            background=default_palette['secondary'],
+            foreground=default_palette['primary'],
+            insertbackground=default_palette['tertiary']  # Cursor color for HEAT UP editor text widget
         )
+
+    def clear_content(self):
+        """
+        Clears the content of the Flare widget.
+        """
+        self.text_widget.delete('1.0', tk.END)

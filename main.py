@@ -255,7 +255,7 @@ class MainEditor(tk.Frame):
         if self.text_widget.tag_names(start) and tag in self.text_widget.tag_names(start):
             self.text_widget.tag_remove(tag, start, end)
         else:
-            self.text_widget.tag_add(tag, start, end)
+            self.text_widget.add_tag(tag, start, end)
 
     def set_content(self, content):
         """
@@ -365,7 +365,7 @@ class MainEditor(tk.Frame):
         """
         Adds a highlight to the search results.
         """
-        self.text_widget.tag_add("search_highlight", start, end)
+        self.text_widget.add_tag("search_highlight", start, end)
         self.text_widget.tag_config("search_highlight", background="yellow")
         self.search_highlights.append((start, end))
 
