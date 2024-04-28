@@ -48,7 +48,7 @@ class PaletteManager:
                 foreground=self._palette.primary,
                 insertbackground=self._palette.tertiary
             )
-        except ValueError as e:
+        except ValueError:
             logging.error("Error applying Palette to Text Widget", exc_info=True)
         else:
             return True
@@ -76,7 +76,7 @@ class ThemeManager:
 
     def __init__(self):
         self.search_index = 1.0
-        self.search_highlights = tag_removes = []
+        self.search_highlights = []
         self.search_close_button = tk.Button()
         self.search_prev_button = tk.Button()
         self.search_entry = tk.Entry()
@@ -131,57 +131,21 @@ class ThemeManager:
         Binds keyboard shortcuts for invoking the inline search functionality.
         """
         self.text_widget.bind("<Control-f>", self.prompt_search_query)
+def padding(self, PADDING_X=None, PADDING_Y=None):
+        """
+        Adds padding to the search bar.
+        :param self:
+        :param PADDING_X:
+        :param PADDING_Y:
+        :return:
+        """
+        self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=PADDING_X, pady=PADDING_Y)
 
-    def prompt_search_query(self, event=None):
+    def setup_inline_search_manager(self):
         """
-        Prompts the user for a search query and initiates the search.
+        Initializes the InlineSearchManager.
         """
-        self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
-        self.search_entry.focus_set()
-
-    def perform_search(self, event=None):
-        """
-        Performs the inline search based on the user's query.
-        """
-        self.search_query = self.search_entry.get()
-        self.search_index = "1.0"
-        self.clear_search_highlights()
-        self.find_next()
-
-    def find_next(self):
-        """
-        Finds the next occurrence of the search query and highlights it.
-        """
-        if self.search_query:
-            self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex=tk.END)
-            if self.search_index:
-                self.add_search_highlight(
-                    self.search_index,
-                    f"{self.search_index}+{len(self.search_query)}c",
-                )
-                self.search_index = self.text_widget.index(
-                    f"{self.search_index}+{len(self.search_query)}c"
-                )
-            else:
-                self.search_index = "1.0"
-
-    def find_previous(self):
-        """
-        Finds the previous occurrence of the search query and highlights it.
-        """
-        if self.search_query:
-            self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex="1.0",
-                                                        backwards=True)
-            if self.search_index:
-                self.add_search_highlight(
-                    self.search_index,
-                    f"{self.search_index}+{len(self.search_query)}c",
-                )
-                self.search_index = self.text_widget.index(
-                    f"{self.search_index}+{len(self.search_query)}c"
-                )
-            else:
-                self.search_index = tk.END
+        self.inline_search_manager = InlineSearchManager(text_widget=self.text_widget)
 
     def toggle_bold(self, event):
         """
@@ -318,7 +282,9 @@ class ThemeManager:
             self.text_area.pack(fill=tk.BOTH, expand=True)
             self.parent = self.parent or self.master
             self.parent.title("HEAT UP Editor")
-            self.palette_manager = PaletteManager()
+            self.palette_manager = PaletteManager(text_widget=self.text_area)
+            self.theme_manager = ThemeManager()
+            self.text_area = tkinter.Text()
             self.theme_manager = ThemeManager()
             self.text_area = tkinter.Text()
             self.text_area.pack(fill=tk.BOTH, expand=True)

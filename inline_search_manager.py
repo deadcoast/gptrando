@@ -1,11 +1,13 @@
-
+import logging
 import tkinter as tk
 from tkinter import font
+
+from gptrando.main import self
 
 
 class InlineSearchManager:
     def __init__(self):
-        self.find_next = self.find_next
+        self.bar_find_next = self.bar_find_next
         self.find_previous = self.find_previous
         self.perform_search = self.perform_search
         self.add_search_highlight = self.add_search_highlight
@@ -27,21 +29,6 @@ class InlineSearchManager:
         self.search_bar.focus_set()
 
     def find_next(self):
-        if self.search_query:
-            self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex=tk.END)
-            if self.search_index:
-                self.add_search_highlight(
-                    self.search_index,
-                    f"{self.search_index}+{len(self.search_query)}c",
-                )
-                self.search_index = self.text_widget.index(
-                    f"{self.search_index}+{len(self.search_query)}c"
-                )
-            else:
-                self.search_index = "1.0"
-                self._display_message("No more occurrences found.")
-
-    def find_next(self):
         """
         Finds the next occurrence of the search query and highlights it.
         """
@@ -58,6 +45,8 @@ class InlineSearchManager:
             else:
                 self.search_index = "1.0"
                 self._display_message("No more occurrences found.")
+
+
 
     def find_previous(self):
         if self.search_query:
@@ -79,7 +68,7 @@ class InlineSearchManager:
         self.search_query = self.search_bar.get()
         self.search_index = "1.0"
         self.clear_search_highlights()
-        self.find_next()
+        self.bar_find_next()
 
     def _display_message(self, message):
         self.status_bar.config(text=message)
@@ -100,7 +89,7 @@ class InlineSearchManager:
 
     def setup_bindings(self):
         self.text_widget.bind("<Control-f>", self.prompt_search_query)
-        self.text_widget.bind("<Control-n>", self.find_next)
+        self.text_widget.bind("<Control-n>", self.bar_find_next)
         self.text_widget.bind("<Control-p>", self.find_previous)
         self.text_widget.bind("<Control-Return>", self.perform_search)
 
@@ -180,20 +169,8 @@ class InlineSearchManager:
     def setup_text_formatting(self):
         pass
 
-
-    """
-    Provides advanced inline search functionality for the HEAT UP editor.
-    """
-
     def pack(self, side, fill, expand):
-
-
-    def hide_search_bar(self):
-        """
-        Hides the search bar.
-        """
-        self.search_bar.pack_forget()
-        self.clear_search_highlights()
+        pass
 
     def show_search_bar(self):
         """
@@ -240,11 +217,114 @@ def setup_search_bar(self):
     self.search_bar.bind("<Return>", self.perform_search)
 
 
+def clear_search_highlights(self):
+    """
+    Clears the search highlights.
+    """
+    if self.search_highlights:
+        self.text_widget.tag_remove("highlight", "1.0", tk.END)
+        self.search_highlights = []
+
+
+def add_search_highlight(self, start_index, end_index):
+    """
+    Adds a highlight to the search results.
+    """
+    self.text_widget.tag_add("highlight", start_index, end_index)
+    self.text_widget.tag_config("highlight", background="yellow")
+    self.search_highlights.append((start_index, end_index))
+
+
 def perform_search(self, event=None):
     """
     Performs the inline search based on the user's query.
     """
-    self.search_query = self.search_bar.get()
+    self.search_query = self.search_entry.get()
     self.search_index = "1.0"
     self.clear_search_highlights()
-    self.find_next()
+    self.bar_find_next()
+
+
+def find_next(self):
+    """
+    Finds the next occurrence of the search query and highlights it.
+    """
+    if self.search_query:
+        self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex=tk.END)
+        if self.search_index:
+            self.add_search_highlight(
+                self.search_index,
+                f"{self.search_index}+{len(self.search_query)}c",
+            )
+            self.search_index = self.text_widget.index(
+                f"{self.search_index}+{len(self.search_query)}c"
+            )
+        else:
+            self.search_index = "1.0"
+
+
+def find_previous(self):
+    """
+    Finds the previous occurrence of the search query and highlights it.
+    """
+    if self.search_query:
+        self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex="1.0",
+                                                    backwards=True)
+        if self.search_index:
+            self.add_search_highlight(
+                self.search_index,
+                f"{self.search_index}+{len(self.search_query)}c",
+            )
+            self.search_index = self.text_widget.index(
+                f"{self.search_index}+{len(self.search_query)}c"
+            )
+        else:
+            self.search_index = tk.END
+
+
+def setup_inline_search_manager(self):
+    """
+    Initializes the inline search manager.
+    """
+    self.search_query = ""
+    self.search_index = "1.0"
+    self.search_highlights = []
+    self.setup_search_bar()
+    self.setup_bindings()
+
+    self.apply_palette()
+
+    self.apply_palette_and_init()
+    self._display_message("Ready")
+
+    self.text_widget.focus_set()
+
+    self.master.protocol("WM_DELETE_WINDOW", self.close)
+
+    self.master.mainloop()
+
+
+def prompt_search_query(self, event=None, PADDING_X=1, PADDING_Y=1):
+    """
+    Prompts the user for a search query and initiates the search.
+    """
+    try:
+        self.search_bar.pack(side=tk.TOP, fill=tk.X, padx=PADDING_X, pady=PADDING_Y)
+        self.search_entry.focus_set()
+    except tk.TclError as e:
+        logging.exception("Error occurred when calling `pack` or `focus_set` methods")
+
+
+def hide_search_bar(self):
+    """
+    Hides the search bar.
+    """
+
+
+self.search_bar.pack_forget()
+self.clear_search_highlights()
+
+self.search_query = self.search_bar.get()
+self.search_index = "1.0"
+self.clear_search_highlights()
+self.find_next()

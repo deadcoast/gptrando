@@ -86,7 +86,7 @@ class MainEditor(tk.Frame):
         edit_menu = tk.Menu(menubar)
         menubar.add_cascade(label="Edit", menu=edit_menu)
         edit_menu.add_command(label="Find", command=self.find_text)
-        edit_menu.add_command(label="Find Next", command=self.find_next)
+        edit_menu.add_command(label="Find Next", command=self.bar_find_next)
         edit_menu.add_command(label="Find Previous", command=self.find_previous)
         edit_menu.add_separator()
         edit_menu.add_command(label="Copy", command=self.copy_text)

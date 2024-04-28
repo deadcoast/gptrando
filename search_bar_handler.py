@@ -2,6 +2,32 @@
 import tkinter as tk
 from tkinter import font
 
+from gptrando.theme_manager import ThemeManager
+from gptrando.inline_search_manager import InlineSearchManager
+from gptrando.flare_text_extension import FlareTextExtension
+from gptrando.palette_manager import PaletteManager
+
+from .theme_manager import ThemeManager
+from .inline_search_manager import InlineSearchManager
+from .FlareTextExtension import FlareTextExtension
+from .palette_manager import PaletteManager
+
+
+class NoMoreOccurrencesException:
+    pass
+
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
+
+    def __repr__(self):
+        return self.message
+
+    def __call__(self):
+        return self.message
+
 
 class SearchBar(tk.Entry):  # Custom search bar widget
     """
@@ -95,7 +121,7 @@ class SearchBar(tk.Entry):  # Custom search bar widget
 
     def setup_bindings(self):
         self.text_area.bind("<Control-f>", self.inline_search_manager.prompt_search_query)
-        self.text_area.bind("<Control-n>", self.inline_search_manager.find_next)
+        self.text_area.bind("<Control-n>", self.inline_search_manager.bar_find_next)
         self.text_area.bind("<Control-p>", self.inline_search_manager.find_previous)
 
         self.text_area.bind("<Control-s>", self.save_file)
@@ -132,7 +158,7 @@ class SearchBar(tk.Entry):  # Custom search bar widget
             '<Control-b>': self.toggle_formatting,
             '<Control-i>': self.toggle_formatting,
             '<Control-Return>': self.perform_search,
-            '<Control-n>': self.find_next,
+            '<Control-n>': self.bar_find_next,
             '<Control-p>': self.find_previous
         }
 
@@ -146,7 +172,7 @@ class SearchBar(tk.Entry):  # Custom search bar widget
         """
         key_functions = {
             '<Control-s>': self.prompt_search_query,
-            '<F3>': self.find_next,
+            '<F3>': self.bar_find_next,
             '<Shift-F3>': self.find_previous,
             '<Return>': self.perform_search,
         }
@@ -195,25 +221,32 @@ class SearchBar(tk.Entry):  # Custom search bar widget
         self.search_query = self.search_bar.get()
         self.search_index = "1.0"
         self.clear_search_highlights()
-        self.find_next()
+        self.bar_find_next()
 
-    def find_next(self):
+    def bar_find_next(self):
         """
         Finds the next occurrence of the search query and highlights it.
         """
-        if self.search_query:
-            self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex=tk.END)
-            if self.search_index:
-                self.add_search_highlight(
-                    self.search_index,
-                    f"{self.search_index}+{len(self.search_query)}c",
-                )
-                self.search_index = self.text_widget.index(
-                    f"{self.search_index}+{len(self.search_query)}c"
-                )
-            else:
-                self.search_index = "1.0"
-                self._display_message("No more occurrences found.")
+        if not self.search_query:
+            return
+        if new_search_index := self.text_widget.search(
+            self.search_query, self.search_index, stopindex=tk.END
+        ):
+            return self._extracted_from_bar_find_next_(new_search_index)
+        if wrapped_search_index := self.text_widget.search(
+            self.search_query, "1.0", stopindex=self.search_index, backwards=True
+        ):
+            return self._extracted_from_bar_find_next_(wrapped_search_index)
+        else:
+            raise NoMoreOccurrencesException("No more occurrences found.")
+
+    # TODO Rename this here and in `bar_find_next`
+    def _extracted_from_bar_find_next_(self, arg0):
+        end_index = self.text_widget.index(
+            f"{arg0}+{self.text_widget.index(arg0, count=len(self.search_query))}c"
+        )
+        self.add_search_highlight(arg0, end_index)
+        return arg0
 
     def add_search_highlight(self, start, end):
         """
