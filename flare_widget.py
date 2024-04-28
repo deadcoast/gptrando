@@ -1,8 +1,9 @@
+import logging
 import tkinter as tk
 from collections import defaultdict
 from tkinter import font
 
-from gptrando.main import TakeFocusValue
+import main
 
 TAG_BOLD = 'bold'
 TAG_ITALIC = 'italic'
@@ -18,7 +19,7 @@ class FlareTextExtension(tk.Frame):
             master: tk.Misc | None = None,
             cnf=None,
             *,
-            x_focus_val: TakeFocusValue = 1):
+            x_focus_val: main.TakeFocusValue = 1):
         """
         Initialize the FlareTextExtension object.
 
@@ -37,14 +38,58 @@ class FlareTextExtension(tk.Frame):
         self.bold_font = font.Font(family='Courier New', size=12, weight='bold')
         self.italic_font = font.Font(family='Courier New', size=12, slant='italic')
 
-    def init(self, parent, content='', palette=None, **kwargs):
+    def init(self, parent, content='', palette=None, font_family='Courier New', font_size=12, **kwargs):
+        """
+        Initialize the object.
+
+        Args:
+            parent: The parent object.
+            content: The content of the object.
+            palette: The palette of the object.
+            font_family: The font family to use.
+            font_size: The font size to use.
+            **kwargs: Additional keyword arguments.
+        """
         super().init(parent, **kwargs)
 
-        if parent is not None:
-            self.parent = parent
+        self.set_parent(parent)
+        self.set_palette(palette)
+        self.create_text_widget(font_family, font_size, **kwargs)
+        self.place_text_widget()
+
+        try:
+            self.text_widget.grid(row=0, column=0, sticky="nsew")
+        except tk.TclError as e:
+            logging.error(f'Error creating or placing text widget: {e}')
+
+    def set_parent(self, parent):
+        """
+        Set the parent object.
+
+        Args:
+            parent: The parent object.
+        """
+        self.parent = parent
+
+    def set_palette(self, palette):
+        """
+        Set the palette of the object.
+
+        Args:
+            palette: The palette of the object.
+        """
         self.palette = palette or {}
-        self.text_widget = tk.Text(self, font=font.Font(family='Courier New', size=12), wrap=tk.WORD)
-        self.text_widget.grid(row=0, column=0, sticky="nsew")
+
+    def create_text_widget(self, font_family, font_size, **kwargs):
+        """
+        Create the text widget.
+
+        Args:
+            font_family: The font family to use.
+            font_size: The font size to use.
+            **kwargs: Additional keyword arguments.
+        """
+        self.text_widget = tk.Text(self, font=font.Font(family=font_family, size=font_size), wrap=tk.WORD)
 
     def setup_text_formatting(self):
         """
@@ -103,7 +148,7 @@ class FlareTextExtension(tk.Frame):
         Applies the specified color palette to the Flare widget.
         """
         default_palette = defaultdict(lambda: '#303030')
-        default_palette.update(self.palette)
+        default_palette |= self.palette
 
         self.text_widget.configure(
             background=default_palette['secondary'],
@@ -116,3 +161,65 @@ class FlareTextExtension(tk.Frame):
         Clears the content of the Flare widget.
         """
         self.text_widget.delete('1.0', tk.END)
+
+    def place_text_widget(self):
+        """
+        Places the text widget in the parent object.
+        """
+        self.parent.grid_rowconfigure(0, weight=1)
+        self.parent.grid_columnconfigure(0, weight=1)
+        self.parent.grid_rowconfigure(1, weight=0)
+        self.parent.grid_columnconfigure(1, weight=0)
+        self.text_widget.grid(row=0, column=0, sticky="nsew")
+        self.text_widget.grid(row=1, column=1, sticky="nsew")
+        self.text_widget.grid_propagate(False)
+        self.text_widget.grid_rowconfigure(0, weight=1)
+        self.text_widget.grid_columnconfigure(0, weight=1)
+        self.text_widget.grid_rowconfigure(1, weight=0)
+        self.text_widget.grid_columnconfigure(1, weight=0)
+        self.text_widget.grid_rowconfigure(2, weight=0)
+        self.text_widget.grid_columnconfigure(2, weight=0)
+        self.text_widget.grid_rowconfigure(3, weight=0)
+        self.text_widget.grid_columnconfigure(3, weight=0)
+        self.text_widget.grid_rowconfigure(4, weight=0)
+        self.text_widget.grid_columnconfigure(4, weight=0)
+        self.text_widget.grid_rowconfigure(5, weight=0)
+        self.text_widget.grid_columnconfigure(5, weight=0)
+        
+    def set_focus(self):
+        """
+        Sets the focus on the Flare widget.
+        """
+        self.text_widget.focus_set()
+        self.text_widget.focus_force()
+        self.text_widget.focus()
+
+    def close(self):
+        """
+        Closes the Flare widget.
+        """
+        self.destroy()
+        self.text_widget = None
+        self.parent = None
+        self.palette = None
+        self.bold_font = None
+        self.italic_font = None
+# Path: gptrando/flare_widget.py
+# Compare this snippet from gptrando/file_handler_parser.py:CustomExtractionError.__repr__:
+#     def __repr__(self):
+#         return f'CustomExtractionError("{self.message}")' 
+#         ...
+#     def __iadd__(self, other):
+#         self.message += other.message
+#         return self
+#
+# class ChatLogParser.extract_code:
+#     def __init__(self, content):
+#         return re.findall(r"```(.*?)```", content, re.DOTALL)
+#     ...
+#     def extract_code(self, content):
+#         return re.findall(r"```(.*?)```", content, re.DOTALL)
+#         ...
+#     def extract_code(self, content):
+#         return re.findall(r"```(.*?)```", content, re.DOTALL)
+#         ...
