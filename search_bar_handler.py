@@ -463,16 +463,46 @@ class SearchBar(tk.Entry):  # Custom search bar WidgetTest
         Args:
             edit_menu: The edit menu to add commands to.
         """
+        if edit_menu is None:
+            raise ValueError("edit_menu cannot be None.")
+
+        if self.text_area is None:
+            raise ValueError("Invalid text_area. Cannot set up menu bar without a valid text_area.")
+
         try:
-            edit_menu.add_command(label="Undo", command=self.text_area.undo)
-            edit_menu.add_command(label="Redo", command=self.text_area.redo)
-            edit_menu.add_separator()
-            edit_menu.add_command(label="Cut", command=self.text_area.cut)
-            edit_menu.add_command(label="Copy", command=self.text_area.copy)
-            edit_menu.add_command(label="Paste", command=self.text_area.paste)
+            self._extracted_from_setup_menu_bar_15(edit_menu)
         except tk.TclError as e:
             # handle the specific exception
             logging.error(f"An error occurred: {e}")
+
+    # TODO Rename this here and in `setup_menu_bar`
+    def _extracted_from_setup_menu_bar_15(self, edit_menu):
+        if hasattr(self.text_area, 'undo'):
+            edit_menu.add_command(label="Undo", command=self.undo)
+        else:
+            raise AttributeError("text_area does not have 'undo' method")
+
+        if hasattr(self.text_area, 'redo'):
+            edit_menu.add_command(label="Redo", command=self.redo)
+        else:
+            raise AttributeError("text_area does not have 'redo' method")
+
+        edit_menu.add_separator()
+
+        if hasattr(self.text_area, 'cut'):
+            edit_menu.add_command(label="Cut", command=self.cut)
+        else:
+            raise AttributeError("text_area does not have 'cut' method")
+
+        if hasattr(self.text_area, 'copy'):
+            edit_menu.add_command(label="Copy", command=self.copy)
+        else:
+            raise AttributeError("text_area does not have 'copy' method")
+
+        if hasattr(self.text_area, 'paste'):
+            edit_menu.add_command(label="Paste", command=self.paste)
+        else:
+            raise AttributeError("text_area does not have 'paste' method")
 
 
 class SearchBarHandler:
@@ -482,11 +512,15 @@ class SearchBarHandler:
     Attributes:
         search_bar (tk.Entry): The search bar WidgetTest.
         search_query (str): The search query to be searched for.
+        text_widget (tk.Text): The text widget to be searched.
+        search_manager (SearchManager): The search manager object.
     """
 
     def __init__(self, search_bar, search_query):
         self.search_bar = search_bar
         self.search_query = search_query
+        self.text_widget = None
+        self.search_manager = None
 
     def set_palette(self, palette):
         """
@@ -496,14 +530,14 @@ class SearchBarHandler:
             raise ValueError("Palette must be a dictionary.")
         if 'secondary' not in palette or 'primary' not in palette:
             raise ValueError("Palette must contain 'secondary' and 'primary' keys.")
-        self.search_bar.configure(bg=palette.get('secondary'), fg=palette.get('primary'))
+        self.search_bar.configure(bg=palette['secondary'], fg=palette['primary'])
 
     def set_text_widget(self, text_widget):
         """
         Sets the text WidgetTest to be searched.
         """
         if isinstance(text_widget, tk.Text):
-            self.search_bar.set_text_widget(text_widget)
+            self.text_widget = text_widget
         else:
             raise ValueError("Invalid text_widget parameter. Expected tk.Text object.")
 
@@ -511,28 +545,25 @@ class SearchBarHandler:
         """
         Finds the previous occurrence of the search query and highlights it.
         """
-        self.search_bar.find_previous()
+        self.search_manager.find_previous()
 
     def find_next(self):
         """
         Finds the next occurrence of the search query and highlights it.
         """
-        self.search_bar.find_next()
+        self.search_manager.find_next()
 
     def clear_search_highlights(self):
         """
         Clears all search result highlights.
         """
-        self.search_bar.clear_search_highlights()
+        self.search_manager.clear_search_highlights()
 
-    def set_search_query(self, search_query):
+    def set_search_query(self, search_query: str):
         """
         Sets the search query to be searched for.
         """
-        if isinstance(search_query, str):
-            self.search_query = search_query
-        else:
-            raise ValueError("search_query must be a string")
+        self.search_query = search_query
 
     def get_search_query(self):
         """
@@ -540,41 +571,38 @@ class SearchBarHandler:
         """
         return self.search_query
 
-    def set_search_index(self, search_index):
+    def set_search_index(self, search_index: int):
         """
         Sets the current search index.
         """
-        if not isinstance(search_index, int):
-            raise ValueError("search_index must be an integer")
-        self.search_bar.set_search_index(search_index)
+        self.search_manager.set_search_index(search_index)
 
     def get_search_index(self):
         """
         Returns the current search index.
         """
-        return self.search_bar.get_search_index()
+        return self.search_manager.get_search_index()
 
     def perform_search(self):
         """
         Performs the search query.
         """
-        if self.search_query:
-            self.search_bar.perform_search()
+        self.search_manager.perform_search()
 
     def close_search_bar(self):
         """
         Closes the search bar.
         """
-        self.search_bar.close_search_bar()
+        self.search_manager.close_search_bar()
 
     def hide_search_bar(self):
         """
         Hides the search bar.
         """
-        self.search_bar.hide_search_bar()
+        self.search_manager.hide_search_bar()
 
     def show_search_bar(self):
         """
         Shows the search bar.
         """
-        self.search_bar.show_search_bar()
+        self.search_manager.show_search_bar()
