@@ -296,7 +296,7 @@ class InlineSearchManager:
 
     def setup_search_bar(self):
         """
-        Configures the search bar widget.
+        Configures the search bar WidgetTest.
         """
         self.search_bar = tk.Entry(self, font=font.Font(family='Courier New', size=12), width=30)
         self.search_bar.pack(side=tk.TOP, fill=tk.X)
@@ -335,7 +335,7 @@ self.setup_bindings()
 
 def setup_search_bar(self):
     """
-    Configures the search bar widget.
+    Configures the search bar WidgetTest.
     """
     self.search_bar = tk.Entry(self, font=font.Font(family='Courier New', size=12), width=30)
     self.search_bar.pack(side=tk.TOP, fill=tk.X)

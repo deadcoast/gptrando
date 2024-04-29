@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 from tkinter import font
 
@@ -8,7 +9,7 @@ from .theme_manager import theme_manager
 from .theme_manager import ThemeManager
 
 
-class NoMoreOccurrencesException:
+class NoMoreOccurrencesException(Exception):
     pass
 
     def __init__(self, message):
@@ -26,12 +27,12 @@ class NoMoreOccurrencesException:
 
 def emit_text_widget_set_event(callback=None):
     """
-    Emits a text widget set event and returns a boolean indicating the success of the event emission or callback function call.
+    Emits a text WidgetTest set event and returns a boolean indicating the success of the event emission or callback function call.
 
-    This method is responsible for emitting an event or calling a callback function after the text widget is set. It should be called after setting the text widget to perform any necessary actions or updates related to the text widget.
+    This method is responsible for emitting an event or calling a callback function after the text WidgetTest is set. It should be called after setting the text WidgetTest to perform any necessary actions or updates related to the text WidgetTest.
 
     Args:
-        callback (function, optional): A callback function to be called after the text widget is set. Defaults to None.
+        callback (function, optional): A callback function to be called after the text WidgetTest is set. Defaults to None.
 
     Returns:
         bool: True if the event was successfully emitted or the callback function was successfully called, False otherwise.
@@ -46,16 +47,16 @@ def emit_text_widget_set_event(callback=None):
         return False
 
 
-class SearchBar(tk.Entry):  # Custom search bar widget
+class SearchBar(tk.Entry):  # Custom search bar WidgetTest
     """
-    A custom search bar widget that can be used to search for text in a text widget.
+    A custom search bar WidgetTest that can be used to search for text in a text WidgetTest.
 
     Args:
-        master: The parent widget.
-        **kwargs: Additional keyword arguments to pass to the parent widget.
+        master: The parent WidgetTest.
+        **kwargs: Additional keyword arguments to pass to the parent WidgetTest.
 
     Attributes:
-        search_bar: The search bar widget.
+        search_bar: The search bar WidgetTest.
         toggle_formatting: A method that can be used to toggle text formatting.
         close_search_bar: A method that can be used to close the search bar.
         close: A method that can be used to close the search bar.
@@ -135,11 +136,9 @@ class SearchBar(tk.Entry):  # Custom search bar widget
 
         self.text_area.bind("<Control-q>", self.close)
 
-
-
     def setup_search_bar(self):
         """
-        Configures the search bar widget.
+        Configures the search bar WidgetTest.
         """
         self.search_bar = tk.Entry(self, font=font.Font(family='Courier New', size=12), width=30)
         self.search_bar.pack(side=tk.TOP, fill=tk.X)
@@ -189,7 +188,7 @@ class SearchBar(tk.Entry):  # Custom search bar widget
 
     def set_text_widget(self, text_widget):
         """
-        Sets the text widget to be searched.
+        Sets the text WidgetTest to be searched.
         """
         self.text_widget = text_widget
 
@@ -236,18 +235,17 @@ class SearchBar(tk.Entry):  # Custom search bar widget
         if not self.search_query:
             return
         if new_search_index := self.text_widget.search(
-            self.search_query, self.search_index, stopindex=tk.END
+                self.search_query, self.search_index, stopindex=tk.END
         ):
-            return self._extracted_from_bar_find_next_(new_search_index)
+            return self.add_search_highlight(new_search_index)
         if wrapped_search_index := self.text_widget.search(
-            self.search_query, "1.0", stopindex=self.search_index, backwards=True
+                self.search_query, "1.0", stopindex=self.search_index, backwards=True
         ):
-            return self._extracted_from_bar_find_next_(wrapped_search_index)
+            return self.add_search_highlight(wrapped_search_index)
         else:
             raise NoMoreOccurrencesException("No more occurrences found.")
 
-    # TODO Rename this here and in `bar_find_next`
-    def _extracted_from_bar_find_next_(self, arg0):
+    def add_search_highlight(self, arg0):
         end_index = self.text_widget.index(
             f"{arg0}+{self.text_widget.index(arg0, count=len(self.search_query))}c"
         )
@@ -256,21 +254,21 @@ class SearchBar(tk.Entry):  # Custom search bar widget
 
     def add_search_highlight(self, start, end):
         """
-        Adds a search result highlight to the text widget.
+        Adds a search result highlight to the text WidgetTest.
         """
         self.text_widget.tag_add("search_highlight", start, end)
         self.search_highlights.append((start, end))
 
     def set_text_widget(self, text_widget):
         """
-        Sets the text widget to be searched and validates the text_widget argument.
+        Sets the text WidgetTest to be searched and validates the text_widget argument.
         Clears any existing state related to the previous text_widget.
         Emits an event or calls a callback function after the text_widget is set.
         Returns self to allow for method chaining.
         """
         if not isinstance(text_widget, tk.Text):
             raise ValueError("Invalid text_widget. Expected a tk.Text object.")
-    
+
         try:
             self.clear_search_highlights()  # Clear existing search highlights
             self.search_index = "1.0"  # Reset search index
@@ -279,7 +277,7 @@ class SearchBar(tk.Entry):  # Custom search bar widget
         except Exception as e:
             # Handle the exception here (e.g. log the error, display an error message, etc.)
             print(f"Error occurred during assignment of self.text_widget: {e}")
-    
+
         return self
 
     def set_palette(self, palette):
@@ -307,11 +305,45 @@ class SearchBar(tk.Entry):  # Custom search bar widget
         else:
             raise ValueError("Invalid palette. Expected a dictionary.")
 
+    def search(self, search_query: str, search_index: str, stopindex: str, backwards: bool = False):
+        """
+        Searches for the specified search_query in the text WidgetTest.
+
+        Args:
+            search_query (str): The query to search for.
+            search_index (str): The starting index for the search.
+            stopindex (str): The stopping index for the search.
+            backwards (bool, optional): Whether to search backwards. Defaults to False.
+
+        Returns:
+            str: The result of the search.
+
+        Raises:
+            ValueError: If the search_query is not a string.
+            ValueError: If the search_index is not a string.
+            ValueError: If the stopindex is not a string.
+            ValueError: If the backwards is not a boolean.
+        """
+        if not isinstance(search_query, str):
+            raise ValueError("Invalid search_query. Expected a string.")
+        if not isinstance(search_index, str):
+            raise ValueError("Invalid search_index. Expected a string.")
+        if not isinstance(stopindex, str):
+            raise ValueError("Invalid stopindex. Expected a string.")
+        if not isinstance(backwards, bool):
+            raise ValueError("Invalid backwards. Expected a boolean.")
+
+        try:
+            return self.text_widget.search(search_query, search_index, stopindex, backwards)
+        except Exception as e:
+            print(f"Error occurred during search: {e}")
+
     def find_previous(self):
         """
         Finds the previous occurrence of the search query and highlights it.
         """
-        self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex=tk.END, backwards=True)
+        self.search_index = self.text_widget.search(self.search_query, self.search_index, stopindex=tk.END,
+                                                    backwards=True)
         if self.search_index:
             self.add_search_highlight(
                 self.search_index,
@@ -323,7 +355,7 @@ class SearchBar(tk.Entry):  # Custom search bar widget
         else:
             self.search_index = "1.0"
             self._display_message("No more occurrences found.")
-    
+
     @staticmethod
     def validate_input_parameters(tag, start, end):
         error_messages = []
@@ -339,9 +371,9 @@ class SearchBar(tk.Entry):  # Custom search bar widget
 
     def add_tag(self, text_widget, tag, start, end):
         """
-        Adds a tag to the specified text widget from the start index to the end index.
+        Adds a tag to the specified text WidgetTest from the start index to the end index.
 
-        :param text_widget: The text widget to add the tag to.
+        :param text_widget: The text WidgetTest to add the tag to.
         :param tag: The tag to be added.
         :param start: The start index.
         :param end: The end index.
@@ -356,20 +388,193 @@ class SearchBar(tk.Entry):  # Custom search bar widget
         except (tk.TclError, ValueError) as e:
             raise ValueError(f"An error occurred: {e}") from e
 
-    def setup_menu_bar(self):
+    def undo(self):
         """
-        Sets up the menu bar for the application.
+        Undoes the last action and displays a message indicating the success of the operation.
         """
         try:
-            edit_menu = tk.Menu(self.menubar)
-            self.menubar.add_cascade(label="Edit", menu=edit_menu)
+            self.text_area.edit_undo()
+            self._display_message("Undo successful")
+            return True
+        except tk.TclError:
+            self._display_message("No more actions to undo")
+            return False
+
+    def redo(self):
+        """
+        Redoes the last action.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+        """
+        try:
+            if self.text_area.edit_modified():
+                self.text_area.edit_redo()
+                self.text_area.edit_reset()
+                self._display_message("Redo successful")
+                return True
+            else:
+                self._display_message("No action to redo")
+                return False
+        except Exception as e:
+            logging.error(f"Error occurred during redo operation: {e}")
+            return False
+
+    def cut(self):
+        """
+        Cuts the selected text and returns a boolean indicating success.
+        """
+        try:
+            if self.text_area.tag_ranges(tk.SEL):
+                self.text_area.clipboard_clear()
+                self.text_area.event_generate("<<Cut>>")
+                self._display_message("Text cut successfully.")
+                return True
+            else:
+                self._display_message("No text selected.")
+                return False
+        except Exception as e:
+            logging.error(f"Error occurred during cut operation: {e}")
+            return False
+
+    def copy(self):
+        """
+        Copies the selected text.
+        """
+        self.text_area.event_generate("<<Copy>>")
+
+    def paste(self):
+        """
+        Pastes the clipboard content.
+        """
+        try:
+            if clipboard_content := self.master.clipboard_get():
+                self.text_area.insert(tk.INSERT, clipboard_content)
+                self._display_message("Paste successful")
+            else:
+                self._display_message("Clipboard is empty")
+        except tk.TclError as e:
+            self._display_message(f"Error occurred during paste operation: {e}")
+
+    def setup_menu_bar(self, edit_menu):
+        """
+        Sets up the menu bar for the application.
+
+        Args:
+            edit_menu: The edit menu to add commands to.
+        """
+        try:
             edit_menu.add_command(label="Undo", command=self.text_area.undo)
             edit_menu.add_command(label="Redo", command=self.text_area.redo)
             edit_menu.add_separator()
             edit_menu.add_command(label="Cut", command=self.text_area.cut)
             edit_menu.add_command(label="Copy", command=self.text_area.copy)
             edit_menu.add_command(label="Paste", command=self.text_area.paste)
-        except Exception as e:
-            # handle the exception
-            print(f"An error occurred: {e}")
-        
+        except tk.TclError as e:
+            # handle the specific exception
+            logging.error(f"An error occurred: {e}")
+
+
+class SearchBarHandler:
+    """
+    A class to handle the search bar WidgetTest.
+    
+    Attributes:
+        search_bar (tk.Entry): The search bar WidgetTest.
+        search_query (str): The search query to be searched for.
+    """
+
+    def __init__(self, search_bar, search_query):
+        self.search_bar = search_bar
+        self.search_query = search_query
+
+    def set_palette(self, palette):
+        """
+        Applies the specified color palette to the search bar.
+        """
+        if not isinstance(palette, dict):
+            raise ValueError("Palette must be a dictionary.")
+        if 'secondary' not in palette or 'primary' not in palette:
+            raise ValueError("Palette must contain 'secondary' and 'primary' keys.")
+        self.search_bar.configure(bg=palette.get('secondary'), fg=palette.get('primary'))
+
+    def set_text_widget(self, text_widget):
+        """
+        Sets the text WidgetTest to be searched.
+        """
+        if isinstance(text_widget, tk.Text):
+            self.search_bar.set_text_widget(text_widget)
+        else:
+            raise ValueError("Invalid text_widget parameter. Expected tk.Text object.")
+
+    def find_previous(self):
+        """
+        Finds the previous occurrence of the search query and highlights it.
+        """
+        self.search_bar.find_previous()
+
+    def find_next(self):
+        """
+        Finds the next occurrence of the search query and highlights it.
+        """
+        self.search_bar.find_next()
+
+    def clear_search_highlights(self):
+        """
+        Clears all search result highlights.
+        """
+        self.search_bar.clear_search_highlights()
+
+    def set_search_query(self, search_query):
+        """
+        Sets the search query to be searched for.
+        """
+        if isinstance(search_query, str):
+            self.search_query = search_query
+        else:
+            raise ValueError("search_query must be a string")
+
+    def get_search_query(self):
+        """
+        Returns the current search query.
+        """
+        return self.search_query
+
+    def set_search_index(self, search_index):
+        """
+        Sets the current search index.
+        """
+        if not isinstance(search_index, int):
+            raise ValueError("search_index must be an integer")
+        self.search_bar.set_search_index(search_index)
+
+    def get_search_index(self):
+        """
+        Returns the current search index.
+        """
+        return self.search_bar.get_search_index()
+
+    def perform_search(self):
+        """
+        Performs the search query.
+        """
+        if self.search_query:
+            self.search_bar.perform_search()
+
+    def close_search_bar(self):
+        """
+        Closes the search bar.
+        """
+        self.search_bar.close_search_bar()
+
+    def hide_search_bar(self):
+        """
+        Hides the search bar.
+        """
+        self.search_bar.hide_search_bar()
+
+    def show_search_bar(self):
+        """
+        Shows the search bar.
+        """
+        self.search_bar.show_search_bar()

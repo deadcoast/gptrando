@@ -224,7 +224,7 @@ class MainEditor(tk.Frame):
 
     def setup_text_formatting(self):
         """
-        Configures the various text formatting options for the Flare widget.
+        Configures the various text formatting options for the Flare WidgetTest.
         """
         bold_font = font.Font(family='Courier New', size=12, weight='bold')
         italic_font = font.Font(family='Courier New', size=12, slant='italic')
@@ -259,20 +259,20 @@ class MainEditor(tk.Frame):
 
     def set_content(self, content):
         """
-        Sets the content of the Flare widget.
+        Sets the content of the Flare WidgetTest.
         """
         self.text_widget.delete('1.0', tk.END)
         self.text_widget.insert('1.0', content)
 
     def get_content(self):
         """
-        Retrieves the current content of the Flare widget.
+        Retrieves the current content of the Flare WidgetTest.
         """
         return self.text_widget.get('1.0', tk.END).strip()
 
     def apply_palette(self):
         """
-        Applies the specified color palette to the Flare widget.
+        Applies the specified color palette to the Flare WidgetTest.
         """
         self.text_widget.configure(
             background=self.palette.get('secondary', '#303030'),
@@ -284,7 +284,7 @@ class MainEditor(tk.Frame):
 
     def apply_palette_and_init(self):
         """
-        Applies the specified color palette to the Flare widget and initializes the FlareTextExtension.
+        Applies the specified color palette to the Flare WidgetTest and initializes the FlareTextExtension.
         """
         self.flare_text_extension.apply_palette()
         self.flare_text_extension.init()

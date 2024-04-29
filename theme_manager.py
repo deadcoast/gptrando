@@ -36,7 +36,7 @@ class PaletteManager:
 
     def apply_palette(self):
         """
-        Applies the specified color palette to the Flare widget.
+        Applies the specified color palette to the Flare WidgetTest.
         """
         if self.text_widget is None:
             raise ValueError("text_widget cannot be None")
@@ -75,6 +75,8 @@ class ThemeManager:
     """
 
     def __init__(self):
+        self.handle_exit = None
+        self.handle_preview = None
         self.theme_manager = None
         self.text_extension = None
         self.handle_export_code = None
@@ -296,7 +298,7 @@ class ThemeManager:
 
     def setup_text_area(self):
         """
-        Set up the text area widget.
+        Set up the text area WidgetTest.
         """
         self.text_widget = tk.Text(font=font.Font(family='Courier New', size=12))
         self.text_widget.pack(fill=tk.BOTH, expand=True)
@@ -494,126 +496,6 @@ def setup_snippets(self):
     return self.snippets
 
 
-def setup_text_area(self):
-    """
-    Sets up the text widget.
-    """
-    self.text_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=True),
-
-
-def setup_menu_bar(self):
-    pass
-
-
-def toggle_underline(self, event):
-    """
-    Toggles the underline formatting for the selected text.
-    :param self:
-    :param event:
-    :return:
-    """
-    self.toggle_formatting('underline'),
-
-
-def toggle_strike(self, event):
-    """
-    Toggles the strike-through formatting for the selected text.
-    :param self:
-    :param event:
-    :return:
-    """
-    self.toggle_formatting('strike'),
-
-
-def toggle_code(self, event):
-    """
-    Toggles the code formatting for the selected text.
-    :param self:
-    :param event:
-    :return:
-    """
-    self.toggle_formatting('code')
-
-
-def toggle_color(self, event):
-    """
-    Toggles the color formatting for the selected text.
-    """
-    self.toggle_formatting('color'),
-
-
-def toggle_link(self, event):
-    """
-    Toggles the link formatting for the selected text.
-    """
-    self.toggle_formatting('link'),
-
-
-def toggle_code_block(self, event):
-    """
-    Toggles the code block formatting for the selected text.
-    """
-    self.toggle_formatting('code_block'),
-
-
-def toggle_quote(self, event):
-    """
-    Toggles the quote formatting for the selected text.
-    """
-    self.toggle_formatting('quote'),
-
-
-def toggle_list(self, event):
-    """
-    Toggles the list formatting for the selected text.
-    """
-    self.toggle_formatting('list')
-
-
-def toggle_bold(self, event):
-    """
-    Toggles the bold formatting for the selected text.
-    """
-    self.toggle_formatting('bold')
-
-
-def toggle_italic(self, event):
-    """
-    Toggles the italic formatting for the selected text.
-    """
-    self.toggle_formatting('italic')
-
-
-def toggle_formatting(self, tag):
-    """
-    Generic method to toggle the specified text formatting tag.
-    """
-    start, end = self.text_widget.tag_ranges('sel')
-    if self.text_widget.tag_names(start) and tag in self.text_widget.tag_names(start):
-        self.text_widget.tag_remove(tag, start, end)
-    else:
-        self.text_widget.add_tag(tag, start, end)
-
-
-def set_content(self, content):
-    """
-    Sets the content of the Flare widget.
-    """
-    self.text_widget.delete('1.0', tk.END)
-    self.text_widget.insert('1.0', content)
-
-
-def get_content(self):
-    """
-    Retrieves the current content of the Flare widget.
-    """
-    if self.text_widget is None:
-        raise ValueError("text_widget cannot be None")
-
-    # Get the current content of the Flare widget
-    return self.text_widget.get('1.0', 'end-1c').strip()
-
-
 def setup_menu_bar(self):
     self.menu_bar = tk.Menu(self.master)
     self.master.config(menu=self.menu_bar)
@@ -704,7 +586,7 @@ SEARCH_HIGHLIGHT_TAG = "search_highlight"
 
 def clear_search_highlights(self, START_INDEX=None, END_INDEX=None):
     """
-    Removes all search result highlights from the text widget.
+    Removes all search result highlights from the text WidgetTest.
     :param START_INDEX:
     :param END_INDEX:
     """
@@ -712,7 +594,7 @@ def clear_search_highlights(self, START_INDEX=None, END_INDEX=None):
         # Clear the list of search highlights
         self.search_highlights.clear()
 
-        # Remove the search highlight tag from the text widget
+        # Remove the search highlight tag from the text WidgetTest
         self.text_widget.tag_remove(self.SEARCH_HIGHLIGHT_TAG, START_INDEX, END_INDEX)
     except ValueError as e:
         # Log the error details
